@@ -24,4 +24,15 @@ export class AuthService {
             throw new ValidationException(`Error al crear el usuario: El correo ya está registrado`);
         }
     }
+
+    async login(idToken: string) {
+        try {
+            const decodedToken = await auth.verifyIdToken(idToken);
+            console.log(decodedToken)
+            return { uid: decodedToken.uid };
+        } catch (error) {
+            throw new ValidationException('Error al iniciar sesión: Token inválido');
+        }
+    }
+
 }

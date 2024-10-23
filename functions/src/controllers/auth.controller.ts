@@ -72,4 +72,24 @@ export class AuthController {
             }
         }
     };
+
+
+    login = async (req: any, res: any) => {
+        const { idToken } = req.body; // Aquí recibes el ID token
+
+        if (!idToken) {
+            return res.status(400).json({ error: 'ID token is required' });
+        }
+
+        try {
+            const userRecord = await this.authService.login(idToken);
+            res.status(200).json({ uid: userRecord.uid }); // Devuelve el ID del usuario que inició sesión
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                res.status(400).json({ error: error.message }); // Manejo de errores
+            } else {
+                res.status(400).json({ error: 'Unknown error occurred' }); // Error desconocido
+            }
+        }
+    };
 }

@@ -1,0 +1,19 @@
+{
+    "email": "ejemplo20@correo.com",
+    "password": "contraseñaSegura123$",
+    "name": "John",
+    "lastName1": "Doe",
+    "lastName2": "Smith",
+    "actualWeight": 70,
+    "goalWeight": 65,
+    "height": 175,
+    "age": 30,
+    "activityLevel": "moderate",
+    "role": "user",
+    "macros": {
+        "carbs": 250,
+        "proteins": 150,
+        "fats": 70,
+        "kcals": 2200
+    }
+}

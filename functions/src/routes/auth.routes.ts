@@ -12,4 +12,6 @@ router.get('/', (req, res) => {
 
 router.post('/register', authController.register);
 
+router.post('/login', authController.login); 
+
 export default router;
