@@ -8,7 +8,7 @@ export class AuthService {
     async createUser(email: string, password: string) {
         // Validar correo electrónico
         if (!validateMail(email)) {
-            throw new Error('Formato de correo electrónico no válido');
+            throw new ValidationException('Formato de correo electrónico no válido');
         }
 
         // Validar contraseña
