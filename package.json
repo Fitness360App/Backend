@@ -1,0 +1,29 @@
+{
+  "name": "fitness360-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Fitness 360 using Firebase Functions",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon functions/src/index.ts",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.1",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^18.11.18",
+    "eslint": "^9.13.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "private": true
+}
