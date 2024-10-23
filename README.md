@@ -34,3 +34,9 @@ npm install firebase-admin
 
 # Instalar express y firebase-admin (esto también parece repetido)
 npm install express firebase-admin
+
+# Compilar el Proyecto
+npm run build
+
+# Lanzar el Proyecto
+npm run dev
