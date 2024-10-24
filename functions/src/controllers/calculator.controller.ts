@@ -21,11 +21,6 @@ class CalculatorController {
         res.json({ macros });
     };
 
-    public getWeightGoal = (req: Request, res: Response): void => {
-        const { currentWeight, goalWeight } = req.body;
-        const weightGoal = this.calculatorService.getWeightGoal(currentWeight, goalWeight);
-        res.json({ weightGoal });
-    };
 }
 
 export default new CalculatorController();
