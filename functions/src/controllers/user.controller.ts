@@ -1,4 +1,5 @@
 import { UserService } from '../services/user.service';
+import { InternalException } from '../utils/exceptions/InternalException';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { UserNotFoundException } from '../utils/exceptions/userNotFoundException';
 
@@ -22,7 +23,7 @@ export class UserController {
 
             res.status(200).json(userData);  // Devolver los datos del usuario
         } catch (error: any) {
-            res.status(500).json({ error: error.message });  // Manejo de errores
+            throw new InternalException(error.message);
         }
     };
 
@@ -41,7 +42,7 @@ export class UserController {
                 res.status(200).json(goals); 
             } catch (error) {
                 if (error instanceof Error) {
-                    res.status(500).json({ error: error.message });
+                    throw new InternalException(error.message);
                 } else {
                     throw new UnknownErrorException('Error desconocido al obtener los objetivos');
                 }

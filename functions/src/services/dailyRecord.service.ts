@@ -4,6 +4,8 @@ import { DailyRecord } from '../models/dailyRecord.model';
 import { generateRegisterID } from '../utils/idGenerator'; // Asegúrate de importar la función para generar IDs
 import { formatDateToDDMMYYYY } from '../utils/dateUtils';
 import { convertStepsToKcal } from '../utils/caloriesUtils';
+import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
+import { DailyRecordException } from '../utils/exceptions/DailyRecordException';
 
 export class DailyRecordService {
     private dailyRecordCollection = firestore().collection('dailyRegister');
@@ -18,7 +20,7 @@ export class DailyRecordService {
         // Verificar si el registro ya existe
         const exists = await this.recordExists(uid, formattedDate);
         if (exists) {
-            throw new Error(`Ya existe un registro diario para la fecha ${formattedDate}`);
+            throw new DailyRecordException(`Ya existe un registro diario para la fecha ${formattedDate}`);
         }
 
         const emptyRecord: DailyRecord = {
@@ -39,9 +41,9 @@ export class DailyRecordService {
             await this.dailyRecordCollection.add(emptyRecord); // Guarda el registro en Firestore
         } catch (error: unknown) {
             if (error instanceof Error) {
-                throw new Error(`Error al crear el registro diario: ${error.message}`);
+                throw new DailyRecordException(`Error al crear el registro diario: ${error.message}`);
             } else {
-                throw new Error('Error desconocido al crear el registro diario');
+                throw new UnknownErrorException('Error desconocido al crear el registro diario');
             }
         }
     }
@@ -82,7 +84,7 @@ export class DailyRecordService {
             .get();
 
         if (snapshot.empty) {
-            throw new Error(`No se encontró un registro diario para la fecha ${formattedDate}`);
+            throw new DailyRecordException(`No se encontró un registro diario para la fecha ${formattedDate}`);
         }
 
         // Asumir que hay un solo registro por fecha
@@ -113,7 +115,7 @@ export class DailyRecordService {
             .get();
 
         if (snapshot.empty) {
-            throw new Error(`No se encontró un registro diario para la fecha ${formattedDate}`);
+            throw new DailyRecordException(`No se encontró un registro diario para la fecha ${formattedDate}`);
         }
 
         // Asumir que hay un solo registro por fecha
@@ -136,7 +138,7 @@ export class DailyRecordService {
             .get();
 
         if (snapshot.empty) {
-            throw new Error(`No se encontró un registro diario para la fecha ${formattedDate}`);
+            throw new DailyRecordException(`No se encontró un registro diario para la fecha ${formattedDate}`);
         }
 
         // Asumir que hay un solo registro por fecha
@@ -159,7 +161,7 @@ export class DailyRecordService {
             .get();
 
         if (snapshot.empty) {
-            throw new Error(`No se encontró un registro diario para la fecha ${formattedDate}`);
+            throw new DailyRecordException(`No se encontró un registro diario para la fecha ${formattedDate}`);
         }
 
         // Asumir que hay un solo registro por fecha

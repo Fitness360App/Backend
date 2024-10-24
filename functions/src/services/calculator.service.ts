@@ -7,7 +7,7 @@ export class CalculatorService {
         if (height <= 0) {
             throw new Error("Height must be greater than zero.");
         }
-        return weight / (height * height);
+        return Math.round(weight / (height * height));
     }
 
     calculateMacrosByUserData(weight: number, height: number, age: number, gender: 'male' | 'female', activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very active'): { calories: number, protein: number, fat: number, carbs: number } {
