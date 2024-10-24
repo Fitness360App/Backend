@@ -1,4 +1,6 @@
 import { UserService } from '../services/user.service';
+import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
+import { UserNotFoundException } from '../utils/exceptions/userNotFoundException';
 
 export class UserController {
     private userService: UserService;
@@ -15,7 +17,7 @@ export class UserController {
             const userData = await this.userService.getUserDataByID(id);
 
             if (!userData) {
-                return res.status(404).json({ error: 'Usuario no encontrado' });
+                throw new UserNotFoundException('Usuario no encontrado');
             }
 
             res.status(200).json(userData);  // Devolver los datos del usuario
@@ -33,15 +35,15 @@ export class UserController {
                 const goals = await this.userService.getUserGoals(id);
     
                 if (!goals) {
-                    return res.status(404).json({ error: 'Usuario no encontrado' });
+                    throw new UserNotFoundException('Usuario no encontrado');
                 }
     
-                res.status(200).json(goals);  // Devolver los objetivos del usuario
+                res.status(200).json(goals); 
             } catch (error) {
                 if (error instanceof Error) {
                     res.status(500).json({ error: error.message });
                 } else {
-                    res.status(500).json({ error: 'Error desconocido al obtener los objetivos' });
+                    throw new UnknownErrorException('Error desconocido al obtener los objetivos');
                 }
             }
         };

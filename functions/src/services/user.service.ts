@@ -26,7 +26,7 @@ export class UserService {
             return userData;
         } catch (error: unknown) { // Especifica el tipo 'unknown' aquí
             // Verifica si el error es una instancia de UserNotFoundException
-            if (error instanceof UserNotFoundException) {
+            if (error instanceof Error) {
                 throw new UserNotFoundException(`Error al obtener los datos del usuario: ${error.message}`);
             } else {
                 throw new UnknownErrorException('Error desconocido al obtener los datos del usuario'); // Manejo de errores no esperados
@@ -51,7 +51,7 @@ export class UserService {
                 goalWeight: userData.goalWeight,
             };
         } catch (error: unknown) {
-            if (error instanceof UserNotFoundException) {
+            if (error instanceof Error) {
                 throw new UserNotFoundException(`Error al obtener los objetivos del usuario: ${error.message}`);
             } else {
                 throw new UnknownErrorException('Error desconocido al obtener los objetivos del usuario');

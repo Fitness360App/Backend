@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { FoodService } from '../services/food.service';
 import { validateBarcode, validateNutrients, validateServingSize } from '../utils/validation';
 import { Food } from '../models/food.model';
+import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
+import { ValidationException } from '../utils/exceptions/passwordValidateException';
+import { FoodServiceException } from '../utils/exceptions/foodServiceException';
 
 export class FoodController {
     private foodService: FoodService;
@@ -15,14 +18,14 @@ export class FoodController {
         const { barcode } = req.params;
 
         if (!barcode) {
-            return res.status(400).json({ error: 'Barcode is required' });
+            throw new ValidationException('Barcode is required');
         }
 
         try {
             const food = await this.foodService.searchFoodByBarcode(barcode);
 
             if (!food) {
-                return res.status(404).json({ message: 'Food not found' });
+                throw new FoodServiceException('Food not found');
             }
 
             res.status(200).json(food);
@@ -30,7 +33,7 @@ export class FoodController {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });
             } else {
-                res.status(500).json({ error: 'Unknown error occurred' });
+                throw new UnknownErrorException('Unknown error occurred');
             }
         }
     };
@@ -40,14 +43,14 @@ export class FoodController {
         const { name } = req.params; // Obtener el nombre de la URL
 
         if (!name) {
-            return res.status(400).json({ error: 'Product name is required' });
+            throw new ValidationException('Product name is required');
         }
 
         try {
             const foods = await this.foodService.searchFoodByName(name);
 
             if (foods.length === 0) {
-                return res.status(404).json({ error: 'No foods found with that name' });
+                throw new FoodServiceException('No foods found with that name');
             }
 
             res.status(200).json(foods); // Devolver la lista de alimentos encontrados
@@ -55,7 +58,7 @@ export class FoodController {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });
             } else {
-                res.status(500).json({ error: 'Unknown error occurred' });
+                throw new UnknownErrorException('Unknown error occurred');
             }
         }
     };
@@ -66,20 +69,20 @@ export class FoodController {
 
         // Validación de los campos requeridos
         if (!barcode || !name || !brand || !servingSize || !nutrients) {
-            return res.status(400).json({ error: 'All fields are required' });
+            throw new ValidationException('All fields are required');
         }
 
         // Validar que el código de barras tenga un formato válido
         if (!validateBarcode(barcode)) {
-            return res.status(400).json({ error: 'Invalid barcode format' });
+            throw new ValidationException('Invalid barcode format');
         }
 
         if (!validateServingSize(servingSize)) {
-            return res.status(400).json({ error: 'Invalid serving size' });
+            throw new ValidationException('Invalid serving size');
         }
         
         if (!validateNutrients(nutrients)) {
-            return res.status(400).json({ error: 'Invalid nutrient values' });
+            throw new ValidationException('Invalid nutrient values');
         }
 
         // Crear objeto Food
@@ -104,7 +107,7 @@ export class FoodController {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });
             } else {
-                res.status(500).json({ error: 'Unknown error occurred' });
+                throw new UnknownErrorException('Unknown error occurred');  
             }
         }
     };
