@@ -35,6 +35,31 @@ export class FoodController {
         }
     };
 
+    // Método para buscar alimentos por nombre
+    searchFoodByName = async (req: Request, res: Response) => {
+        const { name } = req.params; // Obtener el nombre de la URL
+
+        if (!name) {
+            return res.status(400).json({ error: 'Product name is required' });
+        }
+
+        try {
+            const foods = await this.foodService.searchFoodByName(name);
+
+            if (foods.length === 0) {
+                return res.status(404).json({ error: 'No foods found with that name' });
+            }
+
+            res.status(200).json(foods); // Devolver la lista de alimentos encontrados
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                res.status(500).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: 'Unknown error occurred' });
+            }
+        }
+    };
+
     // Nuevo método para crear un alimento
     createFood = async (req: Request, res: Response) => {
         const { barcode, name, brand, servingSize, nutrients } = req.body;
