@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 // Usar las rutas de autenticación
 app.use('/api/auth', authRoutes);
 
+
 app.use('/api/food', foodRoutes);
 
 app.use('/api/calculator', calculatorRoutes);
