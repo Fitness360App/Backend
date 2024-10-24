@@ -2,12 +2,15 @@ import * as functions from 'firebase-functions';
 import express from 'express';
 import bodyParser from 'body-parser';
 import authRoutes from './routes/auth.routes';
+import foodRoutes from './routes/food.routes';
 
 const app = express();
 app.use(bodyParser.json());
 
 // Usar las rutas de autenticación
 app.use('/api/auth', authRoutes);
+
+app.use('/api/food', foodRoutes);
 
 // Opción de escuchar en un puerto local para pruebas (opcional)
 const PORT = process.env.PORT || 3000; // Puedes usar cualquier puerto que desees
