@@ -1,5 +1,7 @@
 import { firestore } from 'firebase-admin';
 import { User } from '../models/user.model';
+import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
+import { UserNotFoundException } from '../utils/exceptions/userNotFoundException';
 
 export class UserService {
     private userCollection = firestore().collection('users');
@@ -16,18 +18,18 @@ export class UserService {
             const userDoc = await this.userCollection.doc(id_usuario).get();
 
             if (!userDoc.exists) {
-                throw new Error('Usuario no encontrado');  // Si no se encuentra el usuario
+                throw new UserNotFoundException('Usuario no encontrado');  // Si no se encuentra el usuario
             }
 
             // Convertir los datos del documento en un objeto User
             const userData = userDoc.data() as User;
             return userData;
         } catch (error: unknown) { // Especifica el tipo 'unknown' aquí
-            // Verifica si el error es una instancia de Error
-            if (error instanceof Error) {
-                throw new Error(`Error al obtener los datos del usuario: ${error.message}`);
+            // Verifica si el error es una instancia de UserNotFoundException
+            if (error instanceof UserNotFoundException) {
+                throw new UserNotFoundException(`Error al obtener los datos del usuario: ${error.message}`);
             } else {
-                throw new Error('Error desconocido al obtener los datos del usuario'); // Manejo de errores no esperados
+                throw new UnknownErrorException('Error desconocido al obtener los datos del usuario'); // Manejo de errores no esperados
             }
         }
     }
@@ -38,7 +40,7 @@ export class UserService {
             const userDoc = await this.userCollection.doc(id_usuario).get();
 
             if (!userDoc.exists) {
-                throw new Error('Usuario no encontrado');
+                throw new UserNotFoundException('Usuario no encontrado');
             }
 
             const userData = userDoc.data() as User;
@@ -49,10 +51,10 @@ export class UserService {
                 goalWeight: userData.goalWeight,
             };
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                throw new Error(`Error al obtener los objetivos del usuario: ${error.message}`);
+            if (error instanceof UserNotFoundException) {
+                throw new UserNotFoundException(`Error al obtener los objetivos del usuario: ${error.message}`);
             } else {
-                throw new Error('Error desconocido al obtener los objetivos del usuario');
+                throw new UnknownErrorException('Error desconocido al obtener los objetivos del usuario');
             }
         }
     }
