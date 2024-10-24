@@ -11,7 +11,7 @@ export class FoodService {
             const foodSnapshot = await this.foodCollection.where('barcode', '==', barcode).get();
             
             if (foodSnapshot.empty) {
-                return null;
+                throw new FoodServiceException('No se encontró un alimento con ese código de barras');
             }
 
             const foodData = foodSnapshot.docs[0].data() as Food;
@@ -34,7 +34,7 @@ export class FoodService {
                 .get();
     
             if (foodSnapshot.empty) {
-                return []; // Si no se encontró ningún alimento con ese nombre o prefijo
+                throw new FoodServiceException('No se encontró ningún alimento con ese nombre');
             }
 
             

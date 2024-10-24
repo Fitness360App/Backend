@@ -4,6 +4,7 @@ import { UserService } from '../services/user.service';
 import { User } from '../models/user.model';
 import { ValidationException } from '../utils/exceptions/passwordValidateException';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
+import { InternalException } from '../utils/exceptions/InternalException';
 
 export class AuthController {
     private authService: AuthService;
@@ -70,7 +71,7 @@ export class AuthController {
             res.status(201).json({ uid: userRecord.uid }); // Devuelve el ID del usuario creado
         } catch (error: unknown) {
             if (error instanceof Error) {
-                res.status(400).json({ error: error.message }); // Manejo de errores
+                throw new InternalException(error.message); // Error interno
             } else {
                 throw new UnknownErrorException('Unknown error occurred'); // Error desconocido
             }
@@ -90,9 +91,9 @@ export class AuthController {
             res.status(200).json({ uid: userRecord.uid }); // Devuelve el ID del usuario que inició sesión
         } catch (error: unknown) {
             if (error instanceof Error) {
-                res.status(400).json({ error: error.message }); // Manejo de errores
+                throw new InternalException(error.message); // Error interno
             } else {
-                res.status(400).json({ error: 'Unknown error occurred' }); // Error desconocido
+                throw new UnknownErrorException('Unknown error occurred'); // Error desconocido
             }
         }
     };

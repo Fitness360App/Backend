@@ -5,6 +5,7 @@ import { Food } from '../models/food.model';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { ValidationException } from '../utils/exceptions/passwordValidateException';
 import { FoodServiceException } from '../utils/exceptions/foodServiceException';
+import { InternalException } from '../utils/exceptions/InternalException';
 
 export class FoodController {
     private foodService: FoodService;
@@ -31,7 +32,7 @@ export class FoodController {
             res.status(200).json(food);
         } catch (error: unknown) {
             if (error instanceof Error) {
-                res.status(500).json({ error: error.message });
+                throw new InternalException(error.message);
             } else {
                 throw new UnknownErrorException('Unknown error occurred');
             }
@@ -56,7 +57,7 @@ export class FoodController {
             res.status(200).json(foods); // Devolver la lista de alimentos encontrados
         } catch (error: unknown) {
             if (error instanceof Error) {
-                res.status(500).json({ error: error.message });
+                throw new InternalException(error.message);
             } else {
                 throw new UnknownErrorException('Unknown error occurred');
             }
@@ -105,7 +106,7 @@ export class FoodController {
             res.status(201).json({ message: 'Food created successfully' });
         } catch (error: unknown) {
             if (error instanceof Error) {
-                res.status(500).json({ error: error.message });
+                throw new InternalException(error.message);
             } else {
                 throw new UnknownErrorException('Unknown error occurred');  
             }
