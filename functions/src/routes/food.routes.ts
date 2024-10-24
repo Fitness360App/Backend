@@ -7,6 +7,9 @@ const foodController = new FoodController();
 // Ruta para buscar un alimento por código de barras (ya implementado)
 router.get('/search/:barcode', foodController.searchFoodByBarcode);
 
+// Ruta para buscar un alimento por nombre
+router.get('/search/name/:name', foodController.searchFoodByName);
+
 // Nueva ruta para crear un alimento
 router.post('/create', foodController.createFood);
 

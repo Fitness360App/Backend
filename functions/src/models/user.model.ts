@@ -7,7 +7,8 @@ export interface User {
     actualWeight: number;         
     goalWeight: number;           
     height: number;               
-    age: number;                  
+    age: number;
+    gender: string;                
     activityLevel: string;        
     role: string;                 
     macros: {                     
