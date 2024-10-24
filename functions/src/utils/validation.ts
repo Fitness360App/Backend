@@ -40,3 +40,18 @@ export const validatePassword = (password: string) => {
     }
 
 };
+
+export const validateBarcode = (barcode: string): boolean => {
+    const barcodeRegex = /^\d{8,13}$/;  // Código de barras típico de 8 a 13 dígitos
+    return barcodeRegex.test(barcode);
+};
+
+export const validateServingSize = (size: number): boolean => {
+    return size > 0;
+};
+
+export const validateNutrients = (nutrients: { carbs: number; proteins: number; fats: number; kcals: number }): boolean => {
+    const { carbs, proteins, fats, kcals } = nutrients;
+    return carbs >= 0 && proteins >= 0 && fats >= 0 && kcals > 0;
+};
+
