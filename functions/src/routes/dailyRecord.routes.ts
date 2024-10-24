@@ -6,8 +6,20 @@ const router = Router();
 const dailyRecordController = new DailyRecordController();
 
 // Ruta para crear un registro diario vacío
-router.post('/create', dailyRecordController.createEmptyRecord); // Cambia el endpoint según sea necesario
-router.get('/check', dailyRecordController.checkRecordExists);
-router.get('/macros', (req, res) => dailyRecordController.getUserMacros(req, res));
+router.post('/create', (req, res) => dailyRecordController.createEmptyRecord(req, res));
+
+// Ruta para comprobar si existe un registro diario
+router.get('/check', (req, res) => dailyRecordController.checkRecordExists(req, res));
+
+// Ruta para obtener el dailyRecord del usuario
+router.get('/getdailyRecord', (req, res) => dailyRecordController.getDailyRecord(req, res));
+
+// Ruta para actualizar los pasos
+router.put('/updateSteps', dailyRecordController.updateSteps);
+
+// Ruta para actualizar las calorías quemadas
+router.put('/updateBurnedKcals', dailyRecordController.updateBurnedKcals);
+
+router.post('/updateBurnedKcalsFromSteps', dailyRecordController.updateBurnedKcalsFromSteps);
 
 export default router;
