@@ -1,6 +1,6 @@
 import { firestore } from 'firebase-admin';
 import { Food } from '../models/food.model';
-import { ValidationException } from '../utils/exceptions/passwordValidateException';
+import { FoodServiceException } from '../utils/exceptions/foodServiceException';
 
 export class FoodService {
     private foodCollection = firestore().collection('food');
@@ -17,7 +17,7 @@ export class FoodService {
             const foodData = foodSnapshot.docs[0].data() as Food;
             return foodData;
         } catch (error) {
-            throw new ValidationException('Error al buscar el alimento por código de barras');
+            throw new FoodServiceException('Error al buscar el alimento por código de barras');
         }
     }
 
@@ -42,7 +42,7 @@ export class FoodService {
             const foods: Food[] = foodSnapshot.docs.map(doc => doc.data() as Food);
             return foods;
         } catch (error) {
-            throw new ValidationException('Error al buscar el alimento por nombre');
+            throw new FoodServiceException('Error al buscar el alimento por nombre');
         }
     }
 
@@ -53,7 +53,7 @@ export class FoodService {
             const foodSnapshot = await this.searchFoodByBarcode(food.barcode);
             
             if (foodSnapshot) {
-                throw new ValidationException('El alimento ya existe con ese código de barras');
+                throw new FoodServiceException('El alimento ya existe con ese código de barras');
             }
     
             // Crear un nuevo objeto de alimento con el nombre en minúsculas para búsquedas insensibles a mayúsculas
@@ -65,7 +65,7 @@ export class FoodService {
             // Guardar el alimento en Firestore
             await this.foodCollection.add(foodWithLowercaseName);
         } catch (error) {
-            throw new ValidationException('Error al crear el alimento');
+            throw new FoodServiceException('Error al crear el alimento');
         }
     }
 }

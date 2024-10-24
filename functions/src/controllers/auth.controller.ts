@@ -2,6 +2,8 @@
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.model';
+import { ValidationException } from '../utils/exceptions/passwordValidateException';
+import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 
 export class AuthController {
     private authService: AuthService;
@@ -32,15 +34,15 @@ export class AuthController {
 
         // Validación de entrada
         if (!email) {
-            return res.status(400).json({ error: 'Email is required' });
+            throw new ValidationException('Email is required');
         }
 
         if (!password) {
-            return res.status(400).json({ error: 'Password is required' });
+            throw new ValidationException('Password is required');
         }
 
         if (!name) {
-            return res.status(400).json({ error: 'Name is required' });
+            throw new ValidationException('Name is required');
         }
 
         try {
@@ -70,7 +72,7 @@ export class AuthController {
             if (error instanceof Error) {
                 res.status(400).json({ error: error.message }); // Manejo de errores
             } else {
-                res.status(400).json({ error: 'Unknown error occurred' }); // Error desconocido
+                throw new UnknownErrorException('Unknown error occurred'); // Error desconocido
             }
         }
     };
