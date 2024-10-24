@@ -3,6 +3,7 @@ import { firestore } from 'firebase-admin';
 import { DailyRecord } from '../models/dailyRecord.model';
 import { generateRegisterID } from '../utils/idGenerator'; // Asegúrate de importar la función para generar IDs
 import { formatDateToDDMMYYYY } from '../utils/dateUtils';
+import { convertStepsToKcal } from '../utils/caloriesUtils';
 
 export class DailyRecordService {
     private dailyRecordCollection = firestore().collection('dailyRegister');
@@ -60,7 +61,17 @@ export class DailyRecordService {
 
     // Método para obtener las macros del usuario para una fecha específica
     //ESTO ES TEMPORAL, EL INPUT DEBE SER UN DATE()
-    async getUserMacros(uid: string, date: string): Promise<{ carbs: number; proteins: number; fats: number; kcals: number } | null> {
+    async getDailyRecord(uid: string, date: string): Promise<{
+        registerID: string;
+        nutrients: {
+            consumedCarbs: number;
+            consumedProteins: number;
+            consumedFats: number;
+            consumedKcals: number;
+        };
+        steps: number;
+        burnedKcals: number;
+    } | null> {
         const formattedDate = date;
         //const formattedDate = formatDateToDDMMYYYY(fecha); // Formatear la fecha a dd/mm/yyyy
 
@@ -79,10 +90,89 @@ export class DailyRecordService {
 
         // Retornar las macros
         return {
-            carbs: record.nutrients.consumedCarbs,
-            proteins: record.nutrients.consumedProteins,
-            fats: record.nutrients.consumedFats,
-            kcals: record.nutrients.consumedKcals,
+            registerID: record.registerID,
+            nutrients: {
+                consumedCarbs: record.nutrients.consumedCarbs,
+                consumedProteins: record.nutrients.consumedProteins,
+                consumedFats: record.nutrients.consumedFats,
+                consumedKcals: record.nutrients.consumedKcals,
+            },
+            steps: record.steps,
+            burnedKcals: record.burnedKcals,
         };
     }
+
+    //ESTO ES TEMPORAL, EL INPUT DEBE SER UN DATE()
+    async updateSteps(uid: string, date: string, steps: number): Promise<void> {
+        const formattedDate = date; // Suponemos que `date` ya está en formato dd/mm/yyyy
+
+        // Consultar Firestore para obtener el registro del usuario
+        const snapshot = await this.dailyRecordCollection
+            .where('uid', '==', uid)
+            .where('date', '==', formattedDate)
+            .get();
+
+        if (snapshot.empty) {
+            throw new Error(`No se encontró un registro diario para la fecha ${formattedDate}`);
+        }
+
+        // Asumir que hay un solo registro por fecha
+        const recordRef = snapshot.docs[0].ref;
+
+        // Actualizar los pasos sumando los nuevos pasos
+        await recordRef.update({
+            steps: firestore.FieldValue.increment(steps) // Sumar los pasos
+        });
+    }
+
+    // Método para actualizar las calorías quemadas de un registro diario
+    async updateBurnedKcals(uid: string, date: string, burnedKcals: number): Promise<void> {
+        const formattedDate = date; // Suponemos que `date` ya está en formato dd/mm/yyyy
+
+        // Consultar Firestore para obtener el registro del usuario
+        const snapshot = await this.dailyRecordCollection
+            .where('uid', '==', uid)
+            .where('date', '==', formattedDate)
+            .get();
+
+        if (snapshot.empty) {
+            throw new Error(`No se encontró un registro diario para la fecha ${formattedDate}`);
+        }
+
+        // Asumir que hay un solo registro por fecha
+        const recordRef = snapshot.docs[0].ref;
+
+        // Actualizar las calorías quemadas sumando las nuevas calorías
+        await recordRef.update({
+            burnedKcals: firestore.FieldValue.increment(burnedKcals) // Sumar las calorías quemadas
+        });
+    }
+
+    // Método para actualizar las calorías quemadas basado en los pasos
+    async updateBurnedKcalsFromSteps(uid: string, date: string, steps: number): Promise<void> {
+        const formattedDate = date; // Suponemos que `date` ya está en formato dd/mm/yyyy
+
+        // Consultar Firestore para obtener el registro del usuario
+        const snapshot = await this.dailyRecordCollection
+            .where('uid', '==', uid)
+            .where('date', '==', formattedDate)
+            .get();
+
+        if (snapshot.empty) {
+            throw new Error(`No se encontró un registro diario para la fecha ${formattedDate}`);
+        }
+
+        // Asumir que hay un solo registro por fecha
+        const recordRef = snapshot.docs[0].ref;
+
+        // Convertir pasos a calorías
+        const burnedKcals = convertStepsToKcal(steps);
+
+        // Actualizar las calorías quemadas
+        await recordRef.update({
+            burnedKcals: firestore.FieldValue.increment(burnedKcals) // Sumar las calorías quemadas
+        });
+    }
+
+
 }
