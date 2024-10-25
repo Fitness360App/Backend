@@ -1,0 +1,53 @@
+{
+    "email": "juanAntonio0@gmail.com",
+    "password": "meGustanPenes#",
+    "name": "Juan",
+    "lastName1": "Hernandez",
+    "lastName2": "Rodriguez",
+    "actualWeight": 81,
+    "goalWeight": 120,
+    "height": 175,
+    "age": 30,
+    "activityLevel": "moderate",
+    "role": "user",
+    "macros": {
+        "carbs": 250,
+        "proteins": 150,
+        "fats": 70,
+        "kcals": 2200
+    }
+}
+
+
+{
+    "email": "juanAntonio0@gmail.com",
+    "password": "meGustanPenes#",
+    "name": "Juan",
+    "lastName1": "Hernandez",
+    "lastName2": "Rodriguez",
+    "actualWeight": 81,
+    "goalWeight": 120,
+    "height": 175,
+    "age": 30,
+    "activityLevel": "moderate",
+    "role": "user",
+    "macros": {
+        "carbs": 250,
+        "proteins": 150,
+        "fats": 70,
+        "kcals": 2200
+    }
+}
+
+{
+    "barcode": "1234567890123",
+    "name": "Greek Yogurt",
+    "brand": "Healthy Choice",
+    "servingSize": 150,
+    "nutrients": {
+        "carbs": 8,
+        "proteins": 10,
+        "fats": 5,
+        "kcals": 120
+    }
+}

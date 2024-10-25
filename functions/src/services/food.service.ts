@@ -11,7 +11,8 @@ export class FoodService {
             const foodSnapshot = await this.foodCollection.where('barcode', '==', barcode).get();
             
             if (foodSnapshot.empty) {
-                throw new FoodServiceException('No se encontró un alimento con ese código de barras');
+                return null;
+                //throw new FoodServiceException('No se encontró un alimento con ese código de barras');
             }
 
             const foodData = foodSnapshot.docs[0].data() as Food;
@@ -49,13 +50,14 @@ export class FoodService {
     // Nuevo método para crear un alimento en Firestore
     async createFood(food: Food): Promise<void> {
         try {
+            console.log(food);
             // Verificar si el alimento ya existe por código de barras
             const foodSnapshot = await this.searchFoodByBarcode(food.barcode);
             
             if (foodSnapshot) {
                 throw new FoodServiceException('El alimento ya existe con ese código de barras');
             }
-    
+            console.log("Entro");
             // Crear un nuevo objeto de alimento con el nombre en minúsculas para búsquedas insensibles a mayúsculas
             const foodWithLowercaseName = {
                 ...food,

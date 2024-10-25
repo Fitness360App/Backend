@@ -100,11 +100,14 @@ export class FoodController {
             }
         };
 
+        console.log(food)
+
         try {
             // Intentar crear el alimento en Firestore
             await this.foodService.createFood(food);
             res.status(201).json({ message: 'Food created successfully' });
         } catch (error: unknown) {
+            console.error('Error in createFood:', error);
             if (error instanceof Error) {
                 throw new InternalException(error.message);
             } else {
