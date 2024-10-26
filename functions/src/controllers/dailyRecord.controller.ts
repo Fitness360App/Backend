@@ -16,7 +16,7 @@ export class DailyRecordController {
         const { uid, date } = req.body; // Obtener el UID del usuario desde el cuerpo de la solicitud
 
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
         try {
@@ -24,9 +24,9 @@ export class DailyRecordController {
             res.status(201).json({ message: 'Registro diario vacío creado exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al crear el registro diario');
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };
@@ -36,11 +36,11 @@ export class DailyRecordController {
         const { uid, date } = req.body; // Obtener UID del usuario y fecha desde el cuerpo de la solicitud
 
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
 
         try {
@@ -48,9 +48,9 @@ export class DailyRecordController {
             res.status(200).json({ exists }); // Devuelve verdadero o falso
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al comprobar el registro diario');
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };
@@ -60,11 +60,11 @@ export class DailyRecordController {
         const { uid, date } = req.body; // Obtener UID del usuario y fecha desde el cuerpo de la solicitud
 
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
 
         try {
@@ -72,9 +72,9 @@ export class DailyRecordController {
             res.status(200).json(macros); // Devuelve las macros
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al obtener las macros del usuario');     
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };
@@ -84,15 +84,15 @@ export class DailyRecordController {
         const { uid, date, steps } = req.body; // Obtener UID del usuario, fecha y pasos desde el cuerpo de la solicitud
 
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
 
         if (steps === undefined) {
-            throw new ValidationException('El número de pasos es requerido');
+            return res.status(400).json({ message: 'El número de pasos es requerido' });
         }
 
         try {
@@ -100,9 +100,9 @@ export class DailyRecordController {
             res.status(200).json({ message: 'Pasos actualizados exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al actualizar los pasos');
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };
@@ -113,15 +113,15 @@ export class DailyRecordController {
         const { uid, date, burnedKcals } = req.body; // Obtener UID del usuario, fecha y calorías quemadas desde el cuerpo de la solicitud
 
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
 
         if (burnedKcals === undefined) {
-            throw new ValidationException('El número de calorías quemadas es requerido');
+            return res.status(400).json({ message: 'El número de calorías quemadas es requerido' });
         }
 
         try {
@@ -129,9 +129,9 @@ export class DailyRecordController {
             res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al actualizar las calorías quemadas');
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };
@@ -142,15 +142,15 @@ export class DailyRecordController {
         const { uid, date, steps } = req.body; // Obtener UID del usuario, fecha y pasos desde el cuerpo de la solicitud
 
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
 
         if (steps == null) {
-            throw new ValidationException('El número de pasos es requerido');
+            return res.status(400).json({ message: 'El número de pasos es requerido' });
         }
 
         try {
@@ -158,9 +158,9 @@ export class DailyRecordController {
             res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al actualizar las calorías quemadas');
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };

@@ -28,11 +28,11 @@ export class MealController {
         const { uid, type } = req.body;
 
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
         if (!type) {
-            throw new ValidationException('El tipo de comida es requerido');
+            return res.status(400).json({ message: 'El tipo de comida es requerido' });
         }
 
         try {

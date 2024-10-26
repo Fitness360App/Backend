@@ -1,6 +1,7 @@
 import { firestore } from 'firebase-admin';
 import { Food } from '../models/food.model';
 import { FoodServiceException } from '../utils/exceptions/foodServiceException';
+import { InternalException } from '../utils/exceptions/InternalException';
 
 export class FoodService {
     private foodCollection = firestore().collection('food');
@@ -12,7 +13,6 @@ export class FoodService {
             
             if (foodSnapshot.empty) {
                 return null;
-                //throw new FoodServiceException('No se encontró un alimento con ese código de barras');
             }
 
             const foodData = foodSnapshot.docs[0].data() as Food;
@@ -50,24 +50,24 @@ export class FoodService {
     // Nuevo método para crear un alimento en Firestore
     async createFood(food: Food): Promise<void> {
         try {
-            console.log(food);
             // Verificar si el alimento ya existe por código de barras
+            
             const foodSnapshot = await this.searchFoodByBarcode(food.barcode);
+           
             
             if (foodSnapshot) {
-                throw new FoodServiceException('El alimento ya existe con ese código de barras');
+                throw new FoodServiceException('El alimento ya existe');
             }
-            console.log("Entro");
             // Crear un nuevo objeto de alimento con el nombre en minúsculas para búsquedas insensibles a mayúsculas
             const foodWithLowercaseName = {
                 ...food,
                 name: food.name.toLowerCase() // Almacenar el nombre en minúsculas
             };
-    
+           
             // Guardar el alimento en Firestore
             await this.foodCollection.add(foodWithLowercaseName);
         } catch (error) {
-            throw new FoodServiceException('Error al crear el alimento');
+            throw new FoodServiceException('El alimento con codigo de barras ya existe');
         }
     }
 }

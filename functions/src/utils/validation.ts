@@ -12,8 +12,7 @@ export const validateMail = (email: string): boolean => {
 
 // Función para validar la contraseña
 export const validatePassword = (password: string) => {
-    const errors: string[] = [];
-    
+
     // Validar longitud mínima
     if (password.length < 8) {
         throw new ValidationException('La contraseña debe tener al menos 8 caracteres.');
