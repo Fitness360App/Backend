@@ -44,7 +44,7 @@ export class MealService {
     
             let mealId: string;
             let foods: any[] = [];
-    
+
             if (mealSnapshot.empty) {
                 // Si no existe el meal, lo crea
                 mealId = generateMealID();

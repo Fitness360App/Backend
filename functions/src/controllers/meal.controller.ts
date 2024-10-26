@@ -17,31 +17,29 @@ export class MealController {
     // Controller method to add a food item to a meal
     addFoodToMeal = async (req: any, res: any) => {
         const { barcode, uid, type, servingSize } = req.body;
+        const requiredFields = [
+            { field: 'uid', message: 'User UID is required' },
+            { field: 'barcode', message: 'Food barcode is required' },
+            { field: 'type', message: 'Meal type is required' },
+            { field: 'servingSize', message: 'Serving size is required' }
+        ];
 
-        if (!uid) {
-            return res.status(400).json({ message: 'UID del usuario es requerido' });
-        }
-
-        if (!barcode) {
-            return res.status(400).json({ message: 'El código de barras del alimento es requerido' });
-        }
-
-        if (!type) {
-            return res.status(400).json({ message: 'El tipo de comida es requerido' });
-        }
-
-        if (servingSize === undefined) {
-            return res.status(400).json({ message: 'El tamaño de la porción es requerido' });
+        for (const { field, message } of requiredFields) {
+            if (!req.body[field]) {
+                
+                return res.status(400).json({ message });
+            }
         }
 
         try {
             // Verificar si el usuario existe
+            
             const userExists = await this.userController.userExists(uid);
 
             if (!userExists) {
                 return res.status(404).json({ message: 'El usuario no existe' });
             }
-
+            
             await this.mealService.addFoodToMeal(barcode, uid, type, servingSize);
             res.status(200).json({ message: 'Food item added to meal and serving size updated successfully' });
         } catch (error) {
@@ -53,19 +51,18 @@ export class MealController {
 
     removeFoodFromMeal = async (req: any, res: any) => {
         const { barcode, uid, type } = req.body;
-    
-        if (!uid) {
-            return res.status(400).json({ message: 'UID del usuario es requerido' });
+        const requiredFields = [
+            { field: 'uid', message: 'UID del usuario es requerido' },
+            { field: 'barcode', message: 'El código de barras del alimento es requerido' },
+            { field: 'type', message: 'El tipo de comida es requerido' }
+        ];
+
+        for (const { field, message } of requiredFields) {
+            if (!req.body[field]) {
+            return res.status(400).json({ message });
+            }
         }
-    
-        if (!barcode) {
-            return res.status(400).json({ message: 'El código de barras del alimento es requerido' });
-        }
-    
-        if (!type) {
-            return res.status(400).json({ message: 'El tipo de comida es requerido' });
-        }
-    
+
         try {
             // Verificar si el usuario existe
             const userExists = await this.userController.userExists(uid);
@@ -85,17 +82,18 @@ export class MealController {
     // Método para verificar si existe un Meal del mismo tipo para el usuario
     checkMealExists = async (req: any, res: any) => {
         const { uid, type } = req.body;
-    
-        if (!uid) {
-            return res.status(400).json({ message: 'UID del usuario es requerido' });
+        const requiredFields = [
+            { field: 'uid', message: 'UID del usuario es requerido' },
+            { field: 'type', message: 'El tipo de comida es requerido' }
+        ];
+
+        for (const { field, message } of requiredFields) {
+            if (!req.body[field]) {
+            return res.status(400).json({ message });
+            }
         }
-    
-        if (!type) {
-            return res.status(400).json({ message: 'El tipo de comida es requerido' });
-        }
-    
+
         try {
-            // Verificar si el usuario existe
             const userExists = await this.userController.userExists(uid);
             
             if (!userExists) {
@@ -103,7 +101,7 @@ export class MealController {
             }
     
             const exists = await this.mealService.mealExists(uid as string, type as string);
-            res.status(200).json({ exists }); // Devuelve `true` o `false`
+            res.status(200).json({ exists }); 
         } catch (error) {
             if (error instanceof InternalException) {
                 res.status(500).json({ error: error.message });
@@ -117,21 +115,17 @@ export class MealController {
     // Controller method to edit food item in a meal
     editFoodInMeal = async (req: any, res: any) => {
         const { barcode, uid, type, newSize } = req.body;
+        const requiredFields = [
+            { field: 'uid', message: 'UID del usuario es requerido' },
+            { field: 'barcode', message: 'El código de barras del alimento es requerido' },
+            { field: 'type', message: 'El tipo de comida es requerido' },
+            { field: 'newSize', message: 'El nuevo tamaño de la porción es requerido' }
+        ];
 
-        if (!uid) {
-            return res.status(400).json({ message: 'UID del usuario es requerido' });
-        }
-
-        if (!barcode) {
-            return res.status(400).json({ message: 'El código de barras del alimento es requerido' });
-        }
-
-        if (!type) {
-            return res.status(400).json({ message: 'El tipo de comida es requerido' });
-        }
-
-        if (newSize === undefined) {
-            return res.status(400).json({ message: 'El nuevo tamaño de la porción es requerido' });
+        for (const { field, message } of requiredFields) {
+            if (!req.body[field]) {
+            return res.status(400).json({ message });
+            }
         }
 
         try {
