@@ -12,7 +12,7 @@ export class UserService {
         await userRef.set(user);
     }
 
-    async getUserDataByID(id_usuario: string): Promise<User | null> {
+    async getUserDataByID(id_usuario: string): Promise<User> {
         try {
             // Intentar obtener el documento del usuario por su ID
             const userDoc = await this.userCollection.doc(id_usuario).get();

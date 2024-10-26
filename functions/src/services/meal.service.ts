@@ -3,6 +3,8 @@ import { Meal } from '../models/meal.model';
 import { generateMealID } from '../utils/idGenerator';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { FoodService } from './food.service';
+import { MealException } from '../utils/exceptions/mealException';
+import { InternalException } from '../utils/exceptions/InternalException';
 //import { MealException } from '../utils/exceptions/mealException';
 
 export class MealService {
@@ -50,14 +52,14 @@ export class MealService {
                 if (!mealSnapshot.empty) {
                     mealId = mealSnapshot.docs[0].id;
                 } else {
-                    throw new UnknownErrorException('Error retrieving existing meal ID.');
+                    throw new MealException('Error retrieving existing meal ID.');
                 }
             }
 
             // Retrieve food item by barcode
             const food = await this.foodService.searchFoodByBarcode(barcode);
             if (!food) {
-                throw new UnknownErrorException(`Food item with barcode ${barcode} not found.`);
+                throw new MealException(`Food item with barcode ${barcode} not found.`);
             }
 
             // Add food item to the meal
@@ -66,7 +68,7 @@ export class MealService {
             });
         } catch (error) {
             if (error instanceof Error) {
-                throw new UnknownErrorException(`Error adding food to meal: ${error.message}`);
+                throw new InternalException(`Error adding food to meal: ${error.message}`);
             } else {
                 throw new UnknownErrorException('Unknown error adding food to meal.');
             }

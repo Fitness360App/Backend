@@ -2,10 +2,8 @@ import { Request, Response } from 'express';
 import { FoodService } from '../services/food.service';
 import { validateBarcode, validateNutrients, validateServingSize } from '../utils/validation';
 import { Food } from '../models/food.model';
-import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { ValidationException } from '../utils/exceptions/passwordValidateException';
 import { FoodServiceException } from '../utils/exceptions/foodServiceException';
-import { InternalException } from '../utils/exceptions/InternalException';
 
 export class FoodController {
     private foodService: FoodService;
@@ -19,24 +17,25 @@ export class FoodController {
         const { barcode } = req.params;
 
         if (!barcode) {
-            throw new ValidationException('Barcode is required');
+            res.status(400).json({ message: 'Barcode is required' });
         }
 
         try {
             const food = await this.foodService.searchFoodByBarcode(barcode);
 
             if (!food) {
-                throw new FoodServiceException('Food not found');
+                return res.status(404).json({ message: 'Food not found' });
             }
 
             res.status(200).json(food);
         } catch (error: unknown) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Unknown error occurred');
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
+        
     };
 
     // Método para buscar alimentos por nombre
@@ -44,22 +43,22 @@ export class FoodController {
         const { name } = req.params; // Obtener el nombre de la URL
 
         if (!name) {
-            throw new ValidationException('Product name is required');
+            res.status(400).json({ message: 'Product name is required' });
         }
 
         try {
             const foods = await this.foodService.searchFoodByName(name);
 
             if (foods.length === 0) {
-                throw new FoodServiceException('No foods found with that name');
+                return res.status(400).json({ message: 'No foods found with that name' });
             }
 
             res.status(200).json(foods); // Devolver la lista de alimentos encontrados
         } catch (error: unknown) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Unknown error occurred');
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };
@@ -70,20 +69,20 @@ export class FoodController {
 
         // Validación de los campos requeridos
         if (!barcode || !name || !brand || !servingSize || !nutrients) {
-            throw new ValidationException('All fields are required');
+            res.status(400).json({ message: 'All fields are required' });
         }
 
         // Validar que el código de barras tenga un formato válido
         if (!validateBarcode(barcode)) {
-            throw new ValidationException('Invalid barcode format');
+            return res.status(400).json({ message: 'Invalid barcode format' });
         }
 
         if (!validateServingSize(servingSize)) {
-            throw new ValidationException('Invalid serving size');
+            return res.status(400).json({ message: 'Invalid serving size' });
         }
         
         if (!validateNutrients(nutrients)) {
-            throw new ValidationException('Invalid nutrient values');
+            return res.status(400).json({ message: 'Invalid nutrient values' });
         }
 
         // Crear objeto Food
@@ -100,18 +99,16 @@ export class FoodController {
             }
         };
 
-        console.log(food)
 
         try {
             // Intentar crear el alimento en Firestore
             await this.foodService.createFood(food);
             res.status(201).json({ message: 'Food created successfully' });
         } catch (error: unknown) {
-            console.error('Error in createFood:', error);
-            if (error instanceof Error) {
-                throw new InternalException(error.message);
+            if (error instanceof FoodServiceException) {
+                res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Unknown error occurred');  
+                res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
     };

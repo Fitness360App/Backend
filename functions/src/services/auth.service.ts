@@ -27,8 +27,10 @@ export class AuthService {
 
     async login(idToken: string) {
         try {
+            console.log(idToken)
             const decodedToken = await auth.verifyIdToken(idToken);
-            console.log(decodedToken)
+
+            
             return { uid: decodedToken.uid };
         } catch (error) {
             throw new ValidationException('Error al iniciar sesión: Token inválido');
