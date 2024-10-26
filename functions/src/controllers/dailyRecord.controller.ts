@@ -215,5 +215,31 @@ export class DailyRecordController {
     };
 
 
+    updateNutrients = async (req: any, res: any) => {
+        const { uid } = req.body; // Obtener UID del usuario, fecha y pasos desde el cuerpo de la solicitud
+
+        if (!uid) {
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
+        }
+
+        try {
+            // Verificar si el usuario existe
+            const userExists = await this.userController.userExists(uid);
+            
+            if (!userExists) {
+                return res.status(404).json({ message: 'El usuario no existe' });
+            }
+
+            await this.dailyRecordService.updateProcess(uid);
+            res.status(200).json({ message: 'Progreso actualizado correctamente' });
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: 'Unknown error occurred' });
+            }
+        }
+    };
+
     
 }

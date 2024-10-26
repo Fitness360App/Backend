@@ -10,6 +10,7 @@
     "age": 30,
     "activityLevel": "moderate",
     "role": "user",
+    "gender":"transformer",
     "macros": {
         "carbs": 250,
         "proteins": 150,

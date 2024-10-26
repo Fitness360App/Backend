@@ -6,9 +6,16 @@ import { formatDateToDDMMYYYY } from '../utils/dateUtils';
 import { convertStepsToKcal } from '../utils/caloriesUtils';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { DailyRecordException } from '../utils/exceptions/DailyRecordException';
+import { MealService } from './meal.service';
 
 export class DailyRecordService {
     private dailyRecordCollection = firestore().collection('dailyRegister');
+    private mealService: MealService;
+
+    constructor() {
+        this.mealService = new MealService();
+    }
+
 
     // Método para crear un registro diario vacío
 
@@ -176,5 +183,86 @@ export class DailyRecordService {
         });
     }
 
+
+
+
+
+
+
+
+
+
+    // Actualiza los nutrientes consumidos en el registro diario
+    async updateProcess(uid: string): Promise<void> {
+
+        // Inicializar variables para los nutrientes
+        let totalKcals = 0;
+        let totalCarbs = 0;
+        let totalProteins = 0;
+        let totalFats = 0;
+
+        // Definir los tipos de comidas que vamos a procesar
+        const mealTypes = ['breakfast', 'lunch', 'snack', 'dinner', 'extras'] as const;
+
+        // Recorrer cada tipo de comida y obtener el meal correspondiente
+        for (const mealType of mealTypes) {
+            try {
+                const meal = await this.mealService.getMeal(uid, mealType);
+        
+                // Verificar si meal es null o undefined
+                if (meal && meal.foods) { // Asegúrate de que meal y meal.foods no sean nulos
+                    // Recorrer cada alimento en el meal y calcular nutrientes
+                    for (const food of meal.foods) {
+                        // Acceder a los nutrientes dentro de `food.nutrients`
+                        const nutrients = await this.calculateProportionalNutrients(food.nutrients, food.servingSize);
+        
+                        // Acumular los nutrientes en total
+                        totalKcals += nutrients.kcals;
+                        totalCarbs += nutrients.carbs;
+                        totalProteins += nutrients.proteins;
+                        totalFats += nutrients.fats;
+                    }
+                } else {
+                    console.log(`No se encontraron alimentos para el tipo de comida: ${mealType} para el usuario ${uid}`);
+                }
+            } catch (error) {
+                // Manejar la excepción aquí
+                if (error instanceof Error) {
+                    // Aquí puedes acceder a las propiedades del Error
+                    console.log(`No se pudo obtener la comida de tipo ${mealType} para el usuario ${uid}: ${error.message}`);
+                } else {
+                    // Si el error no es una instancia de Error, puedes manejarlo aquí
+                    console.log(`Se produjo un error inesperado: ${error}`);
+                }
+            }
+        }
+
+        // Actualizar el registro diario con los nutrientes calculados
+        const snapshot = await this.dailyRecordCollection
+            .where('uid', '==', uid)
+            .get();
+
+
+        const recordRef = snapshot.docs[0].ref;
+
+        // Actualizar el registro con los nutrientes calculados
+        await recordRef.update({
+            'nutrients.consumedKcals': totalKcals,
+            'nutrients.consumedCarbs': totalCarbs,
+            'nutrients.consumedProteins': totalProteins,
+            'nutrients.consumedFats': totalFats
+        });
+    }
+
+    // Asegúrate de que la función `calculateProportionalNutrients` también está correctamente definida
+    async calculateProportionalNutrients(food: { kcals: number; carbs: number; proteins: number; fats: number }, servingSize: number) {
+        const factor = servingSize / 100; // Proporción en base a 100g
+        return {
+            kcals: food.kcals * factor,
+            carbs: food.carbs * factor,
+            proteins: food.proteins * factor,
+            fats: food.fats * factor
+        };
+    }
 
 }
