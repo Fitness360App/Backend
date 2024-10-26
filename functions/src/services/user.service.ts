@@ -58,4 +58,32 @@ export class UserService {
             }
         }
     }
+
+
+    // Método para modificar los datos del usuario
+    async modifyUserData(uid: string, updatedData: Partial<Omit<User, 'uid' | 'role' | 'macros'>>): Promise<void> {
+        try {
+            const userDoc = await this.userCollection.doc(uid).get();
+            if (!userDoc.exists) {
+                throw new UserNotFoundException('Usuario no encontrado');
+            }
+
+            // Actualizar solo los campos permitidos
+            await this.userCollection.doc(uid).update(updatedData);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new UserNotFoundException(`Error al modificar los datos del usuario: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Error desconocido al modificar los datos del usuario');
+            }
+        }
+    }
+
+    async modifyUserGoals(uid: string, updatedGoals: { carbs: number; proteins: number; fats: number; kcals: number }): Promise<void> {
+        const userRef = this.userCollection.doc(uid);
+        await userRef.update({
+            macros: updatedGoals
+        });
+    }
+
 }

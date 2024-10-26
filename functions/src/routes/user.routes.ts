@@ -10,5 +10,8 @@ router.get('/getUser', userController.getUserDataByID);  // Añadimos una ruta q
 // Ruta para obtener solo los objetivos del usuario
 router.get('/getUserGoals', userController.getUserGoals); // Añadimos esta línea
 
+router.put('/modifyUserData', userController.modifyUserData);  // Añadimos una ruta para modificar los datos del usuario
+
+router.put('/modifyUserGoals', userController.modifyUserGoals);
 
 export default router;
