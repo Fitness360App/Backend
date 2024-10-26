@@ -11,4 +11,9 @@ router.get('/check-exists', mealController.checkMealExists);
 // Route to add a food item to a meal
 router.post('/add-food', mealController.addFoodToMeal);
 
+// Nueva ruta para eliminar un alimento de un meal
+router.delete('/remove', mealController.removeFoodFromMeal);
+
+router.put('/edit', mealController.editFoodInMeal);
+
 export default router;

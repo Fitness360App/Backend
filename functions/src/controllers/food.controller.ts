@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { FoodService } from '../services/food.service';
-import { validateBarcode, validateNutrients, validateServingSize } from '../utils/validation';
+import { validateBarcode, validateNutrients } from '../utils/validation';
 import { Food } from '../models/food.model';
 import { ValidationException } from '../utils/exceptions/passwordValidateException';
 import { FoodServiceException } from '../utils/exceptions/foodServiceException';
@@ -65,10 +65,10 @@ export class FoodController {
 
     // Nuevo método para crear un alimento
     createFood = async (req: Request, res: Response) => {
-        const { barcode, name, brand, servingSize, nutrients } = req.body;
+        const { barcode, name, brand, nutrients } = req.body;
 
         // Validación de los campos requeridos
-        if (!barcode || !name || !brand || !servingSize || !nutrients) {
+        if (!barcode || !name || !brand || !nutrients) {
             res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -77,9 +77,6 @@ export class FoodController {
             return res.status(400).json({ message: 'Invalid barcode format' });
         }
 
-        if (!validateServingSize(servingSize)) {
-            return res.status(400).json({ message: 'Invalid serving size' });
-        }
         
         if (!validateNutrients(nutrients)) {
             return res.status(400).json({ message: 'Invalid nutrient values' });
@@ -90,7 +87,7 @@ export class FoodController {
             barcode,
             name,
             brand,
-            servingSize: parseFloat(servingSize), // Convertir a número
+            servingSize: 100, // Convertir a número
             nutrients: {
                 carbs: parseFloat(nutrients.carbs),
                 proteins: parseFloat(nutrients.proteins),

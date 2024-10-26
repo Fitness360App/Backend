@@ -5,6 +5,7 @@ import { UnknownErrorException } from '../utils/exceptions/unknownErrorException
 import { FoodService } from './food.service';
 import { MealException } from '../utils/exceptions/mealException';
 import { InternalException } from '../utils/exceptions/InternalException';
+
 //import { MealException } from '../utils/exceptions/mealException';
 
 export class MealService {
@@ -23,27 +24,30 @@ export class MealService {
     }
 
 
-    // Function to add a food item to a meal
     async addFoodToMeal(
         barcode: string,
         userId: string,
-        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras'
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras',
+        servingSize: number
     ): Promise<void> {
-        // Validar el tipo de comida
         const validMealTypes = ['breakfast', 'lunch', 'snack', 'dinner', 'extras'];
-        
         if (!validMealTypes.includes(mealType)) {
             throw new MealException(`Tipo de comida no válido: ${mealType}.`);
         }
     
         try {
-            // Check if a meal of the specified type already exists for the user
-            const mealExists = await this.mealExists(userId, mealType);
+            // Verificar si ya existe un meal del tipo especificado para el usuario
+            const mealSnapshot = await this.mealCollection
+                .where('uid', '==', userId)
+                .where('type', '==', mealType)
+                .get();
     
             let mealId: string;
-            if (!mealExists) {
-                // If the meal does not exist, create a new one
-                mealId = generateMealID(); // Generate a new ID for the meal
+            let foods: any[] = [];
+    
+            if (mealSnapshot.empty) {
+                // Si no existe el meal, lo crea
+                mealId = generateMealID();
                 const newMeal: Meal = {
                     id: mealId,
                     type: mealType,
@@ -52,29 +56,29 @@ export class MealService {
                 };
                 await this.mealCollection.doc(mealId).set(newMeal);
             } else {
-                // If the meal exists, get its ID
-                const mealSnapshot = await this.mealCollection
-                    .where('uid', '==', userId)
-                    .where('type', '==', mealType)
-                    .get();
-    
-                if (!mealSnapshot.empty) {
-                    mealId = mealSnapshot.docs[0].id;
-                } else {
-                    throw new MealException('Error retrieving existing meal ID.');
-                }
+                // Si el meal existe, obtiene su ID y los alimentos actuales
+                mealId = mealSnapshot.docs[0].id;
+                const mealData = mealSnapshot.docs[0].data();
+                foods = mealData.foods || [];
             }
     
-            // Retrieve food item by barcode
+            // Verificar si el alimento ya existe en el meal
+            const foodExists = foods.some((food: any) => food.barcode === barcode);
+            if (foodExists) {
+                throw new MealException(`El alimento con código de barras ${barcode} ya existe en el meal de tipo ${mealType}.`);
+            }
+    
+            // Recuperar el alimento por el código de barras
             const food = await this.foodService.searchFoodByBarcode(barcode);
             if (!food) {
-                throw new MealException(`Food item with barcode ${barcode} not found.`);
+                throw new MealException(`No se encontró un alimento con código de barras ${barcode}.`);
             }
     
-            // Add food item to the meal
+            // Agregar el alimento al meal
             await this.mealCollection.doc(mealId).update({
-                foods: firestore.FieldValue.arrayUnion(food)
+                foods: firestore.FieldValue.arrayUnion({ ...food, servingSize })
             });
+    
         } catch (error) {
             if (error instanceof Error) {
                 throw new InternalException(`Error adding food to meal: ${error.message}`);
@@ -83,4 +87,159 @@ export class MealService {
             }
         }
     }
+    
+
+    async removeFoodFromMeal(
+        barcode: string,
+        userId: string,
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras'
+    ): Promise<void> {
+        try {
+            // Verificar si existe un meal del tipo especificado para el usuario
+            const mealSnapshot = await this.mealCollection
+                .where('uid', '==', userId)
+                .where('type', '==', mealType)
+                .get();
+    
+            if (mealSnapshot.empty) {
+                throw new MealException(`No existe un meal de tipo ${mealType} para el usuario ${userId}.`);
+            }
+    
+            const mealId = mealSnapshot.docs[0].id;
+    
+            // Obtener el documento del meal actual
+            const mealDoc = await this.mealCollection.doc(mealId).get();
+            const mealData = mealDoc.data();
+    
+            if (!mealData || !mealData.foods || mealData.foods.length === 0) {
+                throw new MealException('No se encontraron alimentos en el meal.');
+            }
+
+
+            // Filtrar el alimento a eliminar
+            const updatedFoods = mealData.foods.filter((food: any) => food.barcode !== barcode);
+    
+            // Actualizar el documento del meal con el nuevo array de alimentos
+            await this.mealCollection.doc(mealId).update({
+                foods: updatedFoods
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalException(`Error removing food from meal: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Unknown error removing food from meal.');
+            }
+        }
+    }
+
+
+    async editFoodFromMeal(
+        barcode: string,
+        userId: string,
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras',
+        newSize: number // Suponiendo que el tamaño de la porción es un número
+    ): Promise<void> {
+        try {
+            // Verificar si existe un meal del tipo especificado para el usuario
+            const mealSnapshot = await this.mealCollection
+                .where('uid', '==', userId)
+                .where('type', '==', mealType)
+                .get();
+    
+            if (mealSnapshot.empty) {
+                throw new MealException(`No existe un meal de tipo ${mealType} para el usuario ${userId}.`);
+            }
+    
+            const mealId = mealSnapshot.docs[0].id;
+    
+            // Obtener el documento del meal actual
+            const mealDoc = await this.mealCollection.doc(mealId).get();
+            const mealData = mealDoc.data();
+    
+            // Comprobar si no hay alimentos
+            if (!mealData || !mealData.foods || mealData.foods.length === 0) {
+                throw new MealException('No se encontraron alimentos en el meal.');
+            }
+    
+            // Buscar el alimento con el código de barras proporcionado
+            const foodIndex = mealData.foods.findIndex((food: any) => food.barcode === barcode);
+    
+            // Verificar si se encontró el alimento
+            if (foodIndex === -1) {
+                throw new MealException(`No se encontró el alimento con código de barras ${barcode} en el meal.`);
+            }
+    
+            // Actualizar el tamaño de la porción del alimento
+            mealData.foods[foodIndex].servingSize = newSize;
+    
+            // Actualizar el documento del meal con el nuevo array de alimentos
+            await this.mealCollection.doc(mealId).update({
+                foods: mealData.foods
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalException(`Error editing food in meal: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Unknown error editing food in meal.');
+            }
+        }
+    }
+
+
+
+    async getMeal(
+        userId: string,
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras'
+    ): Promise<Meal | null> {
+        try {
+            // Consultar Firestore para obtener el meal correspondiente
+            const mealSnapshot = await this.mealCollection
+                .where('uid', '==', userId)
+                .where('type', '==', mealType)
+                .get();
+
+            // Verificar si el meal existe
+            if (mealSnapshot.empty) {
+                throw new MealException(`No existe un meal de tipo ${mealType} para el usuario ${userId}.`);
+            }
+
+            // Obtener los datos del meal
+            const mealData = mealSnapshot.docs[0].data() as Meal;
+            return mealData;
+
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalException(`Error al obtener el meal: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Error desconocido al obtener el meal.');
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

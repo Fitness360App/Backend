@@ -22,4 +22,6 @@ router.put('/updateBurnedKcals', dailyRecordController.updateBurnedKcals);
 
 router.post('/updateBurnedKcalsFromSteps', dailyRecordController.updateBurnedKcalsFromSteps);
 
+router.post('/updateNutrients', dailyRecordController.updateNutrients);
+
 export default router;
