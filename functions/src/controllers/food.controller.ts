@@ -14,7 +14,7 @@ export class FoodController {
 
     // Método para buscar un alimento por su código de barras (ya implementado)
     searchFoodByBarcode = async (req: Request, res: Response) => {
-        const { barcode } = req.params;
+        const { barcode } = req.body;
 
         if (!barcode) {
             res.status(400).json({ message: 'Barcode is required' });

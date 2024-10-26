@@ -14,7 +14,6 @@ export class MealService {
 
     // Método para verificar si ya existe un Meal del mismo tipo para un usuario
     async mealExists(uid: string, type: string): Promise<boolean> {
-        console.log(uid, type);
         const snapshot = await this.mealCollection
             .where('uid', '==', uid)
             .where('type', '==', type)
@@ -25,12 +24,22 @@ export class MealService {
 
 
     // Function to add a food item to a meal
-    async addFoodToMeal(barcode: string, userId: string, mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras'): Promise<void> {
+    async addFoodToMeal(
+        barcode: string,
+        userId: string,
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras'
+    ): Promise<void> {
+        // Validar el tipo de comida
+        const validMealTypes = ['breakfast', 'lunch', 'snack', 'dinner', 'extras'];
+        
+        if (!validMealTypes.includes(mealType)) {
+            throw new MealException(`Tipo de comida no válido: ${mealType}.`);
+        }
+    
         try {
             // Check if a meal of the specified type already exists for the user
             const mealExists = await this.mealExists(userId, mealType);
-            console.log(mealExists);
-
+    
             let mealId: string;
             if (!mealExists) {
                 // If the meal does not exist, create a new one
@@ -48,20 +57,20 @@ export class MealService {
                     .where('uid', '==', userId)
                     .where('type', '==', mealType)
                     .get();
-
+    
                 if (!mealSnapshot.empty) {
                     mealId = mealSnapshot.docs[0].id;
                 } else {
                     throw new MealException('Error retrieving existing meal ID.');
                 }
             }
-
+    
             // Retrieve food item by barcode
             const food = await this.foodService.searchFoodByBarcode(barcode);
             if (!food) {
                 throw new MealException(`Food item with barcode ${barcode} not found.`);
             }
-
+    
             // Add food item to the meal
             await this.mealCollection.doc(mealId).update({
                 foods: firestore.FieldValue.arrayUnion(food)
