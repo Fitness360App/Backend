@@ -46,9 +46,8 @@ async function login(email, password) {
 
 // Ejemplo de uso
 (async () => {
-    const email = 'ejemplo21@correo.com'; // Cambia por el correo del usuario
-    const password = 'contraseñaSegura123$'; // Cambia por la contraseña del usuario
-
+    const email = "acaimopcgc@gmail.com";
+    const password = "meGustanPene1s#";
     try {
 
         // Iniciar sesión
