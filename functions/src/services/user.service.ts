@@ -86,4 +86,23 @@ export class UserService {
         });
     }
 
+
+    async isUserAdmin(uid: string): Promise<boolean> {
+        try {
+            const userDoc = await this.userCollection.doc(uid).get();
+            if (!userDoc.exists) {
+                throw new Error('Usuario no encontrado');
+            }
+            
+            const userData = userDoc.data() as User;
+            return userData.role === 'admin';
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new Error(`Error al verificar el rol del usuario: ${error.message}`);
+            } else {
+                throw new Error('Error desconocido al verificar el rol del usuario');
+            }
+        }
+    }
+
 }

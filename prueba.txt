@@ -20,8 +20,8 @@
 
 
 {
-    "email": "juanAntonio0@gmail.com",
-    "password": "meGustanPenes#",
+    "email": "acaimopcgc@gmail.com",
+    "password": "meGustanPene1s#",
     "name": "Juan",
     "lastName1": "Hernandez",
     "lastName2": "Rodriguez",
@@ -29,6 +29,7 @@
     "goalWeight": 120,
     "height": 175,
     "age": 30,
+    "gender":"transformer"
     "activityLevel": "moderate",
     "role": "user",
     "macros": {

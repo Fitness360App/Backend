@@ -101,35 +101,52 @@ export class UserController {
     };
 
 
-// Método para modificar los objetivos del usuario
-modifyUserGoals = async (req: any, res: any) => {
-    const { uid } = req.body; // Obtener el ID del usuario desde el cuerpo de la solicitud
-    const updatedGoals = {   // Crear un objeto para los nuevos objetivos de macros
-        carbs: req.body.macros.carbs,
-        proteins: req.body.macros.proteins,
-        fats: req.body.macros.fats,
-        kcals: req.body.macros.kcals,
+    // Método para modificar los objetivos del usuario
+    modifyUserGoals = async (req: any, res: any) => {
+        const { uid } = req.body; // Obtener el ID del usuario desde el cuerpo de la solicitud
+        const updatedGoals = {   // Crear un objeto para los nuevos objetivos de macros
+            carbs: req.body.macros.carbs,
+            proteins: req.body.macros.proteins,
+            fats: req.body.macros.fats,
+            kcals: req.body.macros.kcals,
+        };
+
+        try {
+            // Verifica si el usuario existe
+            const userExists = await this.userExists(uid);
+            
+            if (!userExists) {
+                return res.status(404).json({ message: 'Usuario no encontrado' });
+            }
+
+            // Llama al servicio para actualizar los objetivos del usuario
+            await this.userService.modifyUserGoals(uid, updatedGoals);
+
+            res.status(200).json({ message: 'Objetivos del usuario actualizados exitosamente' });
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: 'Error desconocido ocurrió' });
+            }
+        }
     };
 
-    try {
-        // Verifica si el usuario existe
-        const userExists = await this.userExists(uid);
-        
-        if (!userExists) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
 
-        // Llama al servicio para actualizar los objetivos del usuario
-        await this.userService.modifyUserGoals(uid, updatedGoals);
+    // Método para verificar si el usuario es administrador
+    isUserAdmin = async (req: Request, res: Response) => {
+        const { uid } = req.body; // uid pasado en el cuerpo de la solicitud
 
-        res.status(200).json({ message: 'Objetivos del usuario actualizados exitosamente' });
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).json({ message: error.message });
-        } else {
-            res.status(500).json({ message: 'Error desconocido ocurrió' });
+        try {
+            const isAdmin = await this.userService.isUserAdmin(uid);
+            res.status(200).json({ isAdmin });
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: 'Unknown error occurred' });
+            }
         }
-    }
-};
+    };
 
 }
