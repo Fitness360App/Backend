@@ -14,7 +14,8 @@ export class MealController {
     // Controller method to add a food item to a meal
     addFoodToMeal = async (req: any, res: any) => {
         const { barcode, uid, type } = req.body;
-
+        console.log(req.body);
+        console.log(uid, type);
         try {
             await this.mealService.addFoodToMeal(barcode, uid, type);
             res.status(200).json({ message: 'Food item added to meal successfully' });

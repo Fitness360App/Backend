@@ -9,7 +9,6 @@ class CalculatorController {
     }
 
     public calculateIMCByUserData = (req: Request, res: Response): void => {
-        console.log(req.body);
         const { height, weight } = req.body;
         const imc = this.calculatorService.calculateIMCByUserData(weight, height);
         res.json({ imc });

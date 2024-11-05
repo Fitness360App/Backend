@@ -62,18 +62,26 @@ export class UserService {
     // Método para obtener solo los objetivos del usuario
     async getUserGoals(id_usuario: string): Promise<{ macros: { carbs: number; proteins: number; fats: number; kcals: number }; goalWeight: number } | null> {
         try {
-            //const userDoc = await this.userCollection.doc(id_usuario).get();
-
-            /*if (!userDoc.exists) {
+            // Obtén el repositorio de User
+            const userRepository = AppDataSource.getRepository(User2);
+    
+            // Busca al usuario por ID
+            const user = await userRepository.findOneBy({ uid: id_usuario });
+    
+            // Si no se encuentra el usuario, lanza una excepción
+            if (!user) {
                 throw new UserNotFoundException('Usuario no encontrado');
-            }*/
-
-            const userData = {} as User;
-
+            }
+    
             // Devuelve solo los objetivos del usuario (macros y goalWeight)
             return {
-                macros: userData.macros,
-                goalWeight: userData.goalWeight,
+                macros: {
+                    carbs: user.carbs,
+                    proteins: user.proteins,
+                    fats: user.fats,
+                    kcals: user.kcals,
+                },
+                goalWeight: user.goalWeight,
             };
         } catch (error: unknown) {
             if (error instanceof Error) {

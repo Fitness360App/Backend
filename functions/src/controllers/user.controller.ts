@@ -28,24 +28,24 @@ export class UserController {
     };
 
 
-        // Método para obtener solo los objetivos del usuario
-        getUserGoals = async (req: any, res: any) => {
-            const { id } = req.params;  // Obtener el ID del usuario desde los parámetros de la URL
-    
-            try {
-                const goals = await this.userService.getUserGoals(id);
-    
-                if (!goals) {
-                    throw new UserNotFoundException('Usuario no encontrado');
-                }
-    
-                res.status(200).json(goals); 
-            } catch (error) {
-                if (error instanceof Error) {
-                    throw new InternalException(error.message);
-                } else {
-                    throw new UnknownErrorException('Error desconocido al obtener los objetivos');
-                }
+    // Método para obtener solo los objetivos del usuario
+    getUserGoals = async (req: any, res: any) => {
+        const { id } = req.params;  // Obtener el ID del usuario desde los parámetros de la URL
+
+        try {
+            const goals = await this.userService.getUserGoals(id);
+
+            if (!goals) {
+                throw new UserNotFoundException('Usuario no encontrado');
             }
-        };
+
+            res.status(200).json(goals); 
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalException(error.message);
+            } else {
+                throw new UnknownErrorException('Error desconocido al obtener los objetivos');
+            }
+        }
+    };
 }
