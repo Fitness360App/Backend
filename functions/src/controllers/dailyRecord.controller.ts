@@ -1,8 +1,5 @@
 // src/controllers/dailyRecord.controller.ts
 import { DailyRecordService } from '../services/dailyRecord.service';
-import { InternalException } from '../utils/exceptions/InternalException';
-import { ValidationException } from '../utils/exceptions/passwordValidateException';
-import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { UserService } from '../services/user.service';
 
 import { convertToDatabaseDate } from '../utils/dateUtils';

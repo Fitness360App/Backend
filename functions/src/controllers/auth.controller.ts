@@ -1,9 +1,7 @@
 // src/controllers/auth.controller.ts
 import { AuthService } from '../services/auth.service';
-//import { UserService } from '../services/user.service';
 import { User } from '../models/user.model';
 import { ValidationException } from '../utils/exceptions/passwordValidateException';
-import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { InternalException } from '../utils/exceptions/InternalException';
 
 import { Request, Response } from 'express';
