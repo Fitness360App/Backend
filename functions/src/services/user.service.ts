@@ -36,29 +36,6 @@ export class UserService {
         }
     }
 
-    /*async getUserDataByID(id_usuario: string): Promise<User | null> {
-        try {
-            // Intentar obtener el documento del usuario por su ID
-            console.log("HOLIWI");
-
-            if (!userDoc.exists) {
-                throw new UserNotFoundException('Usuario no encontrado');  // Si no se encuentra el usuario
-            }
-
-            // Convertir los datos del documento en un objeto User
-            //const userData = userDoc.data() as User;
-            var userData = {} as User
-            return userData;
-        } catch (error: unknown) { // Especifica el tipo 'unknown' aquí
-            // Verifica si el error es una instancia de UserNotFoundException
-            if (error instanceof Error) {
-                throw new UserNotFoundException(`Error al obtener los datos del usuario: ${error.message}`);
-            } else {
-                throw new UnknownErrorException('Error desconocido al obtener los datos del usuario'); // Manejo de errores no esperados
-            }
-        }
-    }*/
-
     // Método para obtener solo los objetivos del usuario
     async getUserGoals(id_usuario: string): Promise<{ macros: { carbs: number; proteins: number; fats: number; kcals: number }; goalWeight: number } | null> {
         try {

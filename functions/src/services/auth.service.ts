@@ -10,26 +10,6 @@ import * as bcrypt from 'bcrypt';
 
 
 export class AuthService {
-    /*async createUser(email: string, password: string) {
-        // Validar correo electrónico
-        if (!validateMail(email)) {
-            throw new ValidationException('Formato de correo electrónico no válido');
-        }
-
-        // Validar contraseña
-        validatePassword(password);
-
-        try {
-            const userRecord = await auth.createUser({
-                email,
-                password,
-            });
-            return { uid: userRecord.uid };
-        } catch (error) {
-            throw new ValidationException(`Error al crear el usuario: El correo ya está registrado`);
-        }
-    }*/
-
 
     async createUser(email: string, password: string): Promise<string> {
         // Validar correo electrónico
@@ -46,15 +26,6 @@ export class AuthService {
         return uid;
     }
 
-    /*async login(idToken: string) {
-        try {
-            const decodedToken = await auth.verifyIdToken(idToken);
-            console.log(decodedToken)
-            return { uid: decodedToken.uid };
-        } catch (error) {
-            throw new ValidationException('Error al iniciar sesión: Token inválido');
-        }
-    }*/
 
     async login(email: string, password: string) {
         // Obtiene el repositorio de User

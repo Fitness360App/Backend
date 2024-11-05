@@ -8,24 +8,6 @@ import { Food2 } from "../entity/food";
 
 
 export class FoodService {
-    //private foodCollection = firestore().collection('food');
-
-    // Método para buscar un alimento por su código de barras (ya implementado)
-    /*async searchFoodByBarcode(barcode: string): Promise<Food | null> {
-        try {
-            //const foodSnapshot = await this.foodCollection.where('barcode', '==', barcode).get();
-            
-            if (foodSnapshot.empty) {
-                return null;
-                //throw new FoodServiceException('No se encontró un alimento con ese código de barras');
-            }
-
-            const foodData = {} as Food;
-            return foodData;
-        } catch (error) {
-            throw new FoodServiceException('Error al buscar el alimento por código de barras');
-        }
-    }*/
 
     async searchFoodByBarcode(barcode: string): Promise<Food | null> {
         try {
@@ -55,30 +37,7 @@ export class FoodService {
         }
     }
 
-    // Método para buscar alimentos por nombre
-    /*async searchFoodByName(name: string): Promise<Food[]> {
-        try {
 
-            const lowerCaseName = name.toLowerCase();
-            console.log(lowerCaseName)
-            /*const foodSnapshot = await this.foodCollection
-                .orderBy('name') // Ordenar por el nombre
-                .startAt(lowerCaseName)    // Comenzar desde el nombre proporcionado
-                .endAt(lowerCaseName + '\uf8ff') // Limitar a los nombres que comiencen con el texto
-                .get();
-    
-            if (foodSnapshot.empty) {
-                throw new FoodServiceException('No se encontró ningún alimento con ese nombre');
-            }
-
-            
-    
-            const foods: Food[] = [];
-            return foods;
-        } catch (error) {
-            throw new FoodServiceException('Error al buscar el alimento por nombre');
-        }
-    }*/
 
     async searchFoodByName(name: string): Promise<Food[]> {
         try {
@@ -114,29 +73,7 @@ export class FoodService {
         }
     }
 
-    // Nuevo método para crear un alimento en Firestore
-    /*async createFood(food: Food): Promise<void> {
-        try {
-            console.log(food);
-            // Verificar si el alimento ya existe por código de barras
-            const foodSnapshot = await this.searchFoodByBarcode(food.barcode);
-            
-            if (foodSnapshot) {
-                throw new FoodServiceException('El alimento ya existe con ese código de barras');
-            }
-            console.log("Entro");
-            // Crear un nuevo objeto de alimento con el nombre en minúsculas para búsquedas insensibles a mayúsculas
-            const foodWithLowercaseName = {
-                ...food,
-                name: food.name.toLowerCase() // Almacenar el nombre en minúsculas
-            };
-    
-            // Guardar el alimento en Firestore
-            //await this.foodCollection.add(foodWithLowercaseName);
-        } catch (error) {
-            throw new FoodServiceException('Error al crear el alimento');
-        }
-    }*/
+
 
     async createFood(food: Food): Promise<void> {
         try {

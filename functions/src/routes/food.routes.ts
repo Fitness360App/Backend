@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { FoodController } from '../controllers/food.controller';
 
-const router = Router();
-const foodController = new FoodController();
+const router = Router();const foodController = new FoodController();
 
 // Ruta para buscar un alimento por código de barras (ya implementado)
 router.get('/search/:barcode', foodController.searchFoodByBarcode);

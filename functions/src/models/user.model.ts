@@ -18,4 +18,3 @@ export interface User {
         kcals: number;            
     };
 }
-
