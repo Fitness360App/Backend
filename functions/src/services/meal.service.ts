@@ -71,4 +71,82 @@ export class MealService {
             }
         }
     }
+
+
+    async removeFoodFromMeal(
+        barcode: string,
+        userId: string,
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras'
+    ): Promise<void> {
+        try {
+            const mealRepository = AppDataSource.getRepository(Meal2);
+
+            // Verificar si existe un meal del tipo especificado para el usuario
+            const meal = await mealRepository.findOne({
+                where: { uid: userId, type: mealType },
+                relations: ['foods'],
+            });
+
+            if (!meal) {
+                throw new UnknownErrorException(`No existe un meal de tipo ${mealType} para el usuario ${userId}.`);
+            }
+
+            // Filtrar el alimento a eliminar
+            meal.foods = meal.foods.filter(food => food.barcode !== barcode);
+
+            // Guardar los cambios en la base de datos
+            await mealRepository.save(meal);
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new UnknownErrorException(`Error removing food from meal: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Unknown error removing food from meal.');
+            }
+        }
+    }
+
+
+    async editFoodFromMeal(
+        barcode: string,
+        userId: string,
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras',
+        newSize: number
+    ): Promise<void> {
+        try {
+            const mealRepository = AppDataSource.getRepository(Meal2);
+    
+            // Verificar si existe un meal del tipo especificado para el usuario
+            const meal = await mealRepository.findOne({
+                where: { uid: userId, type: mealType },
+                relations: ['foods'],
+            });
+    
+            if (!meal) {
+                throw new UnknownErrorException(`No existe un meal de tipo ${mealType} para el usuario ${userId}.`);
+            }
+    
+            // Buscar el alimento con el código de barras proporcionado
+            const food = meal.foods.find(food => food.barcode === barcode);
+    
+            if (!food) {
+                throw new UnknownErrorException(`No se encontró el alimento con código de barras ${barcode} en el meal.`);
+            }
+    
+            // Actualizar el tamaño de la porción
+            food.servingSize = newSize;
+            //console.log(food);
+    
+            // Guardar los cambios en la base de datos
+            await AppDataSource.getRepository(Food2).save(food);
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new UnknownErrorException(`Error editing food in meal: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Unknown error editing food in meal.');
+            }
+        }
+    }
+
+    
+    
 }

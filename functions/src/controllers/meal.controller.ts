@@ -14,8 +14,6 @@ export class MealController {
     // Controller method to add a food item to a meal
     addFoodToMeal = async (req: any, res: any) => {
         const { barcode, uid, type } = req.body;
-        console.log(req.body);
-        console.log(uid, type);
         try {
             await this.mealService.addFoodToMeal(barcode, uid, type);
             res.status(200).json({ message: 'Food item added to meal successfully' });
@@ -44,6 +42,71 @@ export class MealController {
                 res.status(500).json({ error: error.message });
             } else {
                 res.status(500).json({ error: 'Error desconocido al verificar el meal' });
+            }
+        }
+    };
+
+    removeFoodFromMeal = async (req: any, res: any) => {
+        const { barcode, uid, type } = req.body;
+        const requiredFields = [
+            { field: 'uid', message: 'UID del usuario es requerido' },
+            { field: 'barcode', message: 'El código de barras del alimento es requerido' },
+            { field: 'type', message: 'El tipo de comida es requerido' }
+        ];
+
+        for (const { field, message } of requiredFields) {
+            if (!req.body[field]) {
+            return res.status(400).json({ message });
+            }
+        }
+
+        try {
+            // Verificar si el usuario existe
+            /*const userExists = await this.userController.userExists(uid);
+            
+            if (!userExists) {
+                return res.status(404).json({ message: 'El usuario no existe' });
+            }*/
+    
+            // Llamar al servicio para eliminar el alimento
+            await this.mealService.removeFoodFromMeal(barcode, uid, type);
+            res.status(200).json({ message: 'Alimento eliminado del meal exitosamente' });
+        } catch (error) {
+            res.status(500).json({ error: 'Error al eliminar el alimento del meal' });
+        }
+    };
+
+
+    editFoodInMeal = async (req: any, res: any) => {
+        const { barcode, uid, type, newSize } = req.body;
+        const requiredFields = [
+            { field: 'uid', message: 'UID del usuario es requerido' },
+            { field: 'barcode', message: 'El código de barras del alimento es requerido' },
+            { field: 'type', message: 'El tipo de comida es requerido' },
+            { field: 'newSize', message: 'El nuevo tamaño de la porción es requerido' }
+        ];
+
+        for (const { field, message } of requiredFields) {
+            if (!req.body[field]) {
+                return res.status(400).json({ message });
+            }
+        }
+
+        try {
+            // Verificar si el usuario existe
+            /*const userExists = await this.userService.userExists(uid);
+
+            if (!userExists) {
+                return res.status(404).json({ message: 'El usuario no existe' });
+            }*/
+
+            await this.mealService.editFoodFromMeal(barcode, uid, type, newSize);
+            res.status(200).json({ message: 'Tamaño de la porción actualizado exitosamente' });
+        } catch (error) {
+            if (error instanceof UnknownErrorException) {
+                res.status(404).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: 'Error updating food in meal' });
             }
         }
     };
