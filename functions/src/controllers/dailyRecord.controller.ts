@@ -4,6 +4,8 @@ import { InternalException } from '../utils/exceptions/InternalException';
 import { ValidationException } from '../utils/exceptions/passwordValidateException';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 
+import { convertToDatabaseDate } from '../utils/dateUtils';
+
 export class DailyRecordController {
     private dailyRecordService: DailyRecordService;
 
@@ -13,14 +15,17 @@ export class DailyRecordController {
 
     // Método para crear un registro diario vacío
     createEmptyRecord = async (req: any, res: any) => {
-        const { uid, date } = req.body; // Obtener el UID del usuario desde el cuerpo de la solicitud
+        const { uid, date } = req.body;
 
         if (!uid) {
             throw new ValidationException('UID del usuario es requerido');
         }
 
+        // Convertir la fecha al formato `YYYY-MM-DD`
+        const formattedDate = convertToDatabaseDate(date);
+
         try {
-            await this.dailyRecordService.createEmptyDailyRecord(uid, date);
+            await this.dailyRecordService.createEmptyDailyRecord(uid, formattedDate);
             res.status(201).json({ message: 'Registro diario vacío creado exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
@@ -33,18 +38,21 @@ export class DailyRecordController {
 
     // Método para comprobar si existe un registro diario para una fecha dada
     checkRecordExists = async (req: any, res: any) => {
-        const { uid, date } = req.body; // Obtener UID del usuario y fecha desde el cuerpo de la solicitud
-
+        const { uid, date } = req.body;
+    
         if (!uid) {
             throw new ValidationException('UID del usuario es requerido');
         }
-
+    
         if (!date) {
             throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
         }
-
+    
+        // Convertir la fecha al formato `YYYY-MM-DD`
+        const formattedDate = convertToDatabaseDate(date);
+    
         try {
-            const exists = await this.dailyRecordService.recordExists(uid, date);
+            const exists = await this.dailyRecordService.recordExists(uid, formattedDate);
             res.status(200).json({ exists }); // Devuelve verdadero o falso
         } catch (error) {
             if (error instanceof Error) {
@@ -57,18 +65,21 @@ export class DailyRecordController {
 
     // Método para obtener el dailyRecord del usuario
     getDailyRecord = async (req: any, res: any) => {
-        const { uid, date } = req.body; // Obtener UID del usuario y fecha desde el cuerpo de la solicitud
-
+        const { uid, date } = req.body;
+    
         if (!uid) {
             throw new ValidationException('UID del usuario es requerido');
         }
-
+    
         if (!date) {
             throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
         }
-
+    
+        // Convertir la fecha al formato `YYYY-MM-DD`
+        const formattedDate = convertToDatabaseDate(date);
+    
         try {
-            const macros = await this.dailyRecordService.getDailyRecord(uid, date); // Convertir a objeto Date
+            const macros = await this.dailyRecordService.getDailyRecord(uid, formattedDate);
             res.status(200).json(macros); // Devuelve las macros
         } catch (error) {
             if (error instanceof Error) {
@@ -80,23 +91,27 @@ export class DailyRecordController {
     };
 
 
-    updateSteps = async (req: any, res: any) => {
-        const { uid, date, steps } = req.body; // Obtener UID del usuario, fecha y pasos desde el cuerpo de la solicitud
 
+    updateSteps = async (req: any, res: any) => {
+        const { uid, date, steps } = req.body;
+    
         if (!uid) {
             throw new ValidationException('UID del usuario es requerido');
         }
-
+    
         if (!date) {
             throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
         }
-
+    
         if (steps === undefined) {
             throw new ValidationException('El número de pasos es requerido');
         }
-
+    
+        // Convertir la fecha al formato `YYYY-MM-DD`
+        const formattedDate = convertToDatabaseDate(date);
+    
         try {
-            await this.dailyRecordService.updateSteps(uid, date, steps); // Llama al servicio para actualizar los pasos
+            await this.dailyRecordService.updateSteps(uid, formattedDate, steps);
             res.status(200).json({ message: 'Pasos actualizados exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
@@ -106,26 +121,30 @@ export class DailyRecordController {
             }
         }
     };
+    
 
 
     // Método para actualizar las calorías quemadas del registro diario
     updateBurnedKcals = async (req: any, res: any) => {
-        const { uid, date, burnedKcals } = req.body; // Obtener UID del usuario, fecha y calorías quemadas desde el cuerpo de la solicitud
-
+        const { uid, date, burnedKcals } = req.body;
+    
         if (!uid) {
             throw new ValidationException('UID del usuario es requerido');
         }
-
+    
         if (!date) {
             throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
         }
-
+    
         if (burnedKcals === undefined) {
             throw new ValidationException('El número de calorías quemadas es requerido');
         }
-
+    
+        // Convertir la fecha al formato `YYYY-MM-DD`
+        const formattedDate = convertToDatabaseDate(date);
+    
         try {
-            await this.dailyRecordService.updateBurnedKcals(uid, date, burnedKcals); // Llama al servicio para actualizar las calorías quemadas
+            await this.dailyRecordService.updateBurnedKcals(uid, formattedDate, burnedKcals);
             res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
@@ -139,22 +158,25 @@ export class DailyRecordController {
 
     // Método para actualizar las calorías quemadas a partir de los pasos
     updateBurnedKcalsFromSteps = async (req: any, res: any) => {
-        const { uid, date, steps } = req.body; // Obtener UID del usuario, fecha y pasos desde el cuerpo de la solicitud
-
+        const { uid, date, steps } = req.body;
+    
         if (!uid) {
             throw new ValidationException('UID del usuario es requerido');
         }
-
+    
         if (!date) {
             throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
         }
-
+    
         if (steps == null) {
             throw new ValidationException('El número de pasos es requerido');
         }
-
+    
+        // Convertir la fecha al formato `YYYY-MM-DD`
+        const formattedDate = convertToDatabaseDate(date);
+    
         try {
-            await this.dailyRecordService.updateBurnedKcalsFromSteps(uid, date, steps);
+            await this.dailyRecordService.updateBurnedKcalsFromSteps(uid, formattedDate, steps);
             res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
