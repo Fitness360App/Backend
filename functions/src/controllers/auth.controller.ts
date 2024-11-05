@@ -37,9 +37,9 @@ export class AuthController {
         } = req.body;
 
         // Validación de entrada
-        if (!email) throw new ValidationException('Email is required');
-        if (!password) throw new ValidationException('Password is required');
-        if (!name) throw new ValidationException('Name is required');
+        if (!email) return res.status(400).json({ error: 'Email is required' });
+        if (!password) return res.status(400).json({ error: 'Password is required' });
+        if (!name) return res.status(400).json({ error: 'Name is required' });
 
         try {
             const authService = new AuthService();
@@ -69,12 +69,12 @@ export class AuthController {
 
             await userRepository.save(newUser);
 
-            res.status(201).json({ uid }); // Devuelve el ID del usuario creado
+            return res.status(201).json({ uid }); // Devuelve el ID del usuario creado
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message); // Error interno
+                return res.status(500).json({ error: error.message }); // Error interno
             } else {
-                throw new UnknownErrorException('Unknown error occurred'); // Error desconocido
+                return res.status(500).json({ error: 'Unknown error occurred' }); // Error desconocido
             }
         }
     };
@@ -91,14 +91,14 @@ export class AuthController {
         try {
             const authService = new AuthService();
             const userRecord = await authService.login(email, password);
-            res.status(200).json({ uid: userRecord.uid }); // Devuelve el ID del usuario autenticado
+            return res.status(200).json({ uid: userRecord.uid }); 
         } catch (error) {
             if (error instanceof ValidationException) {
                 return res.status(400).json({ error: error.message }); // Error de validación
             } else if (error instanceof InternalException) {
                 return res.status(500).json({ error: error.message }); // Error interno
             } else {
-                throw new UnknownErrorException('Unknown error occurred'); // Error desconocido
+                return res.status(500).json({ error: 'Unknown error occurred' }); // Error desconocido
             }
         }
     };
