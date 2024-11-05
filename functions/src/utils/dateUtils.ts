@@ -1,4 +1,5 @@
 import { format, parse } from 'date-fns';
+import { ValidationException } from './exceptions/passwordValidateException';
 
 export function formatDateToDDMMYYYY(date: Date): string {
     const day = String(date.getDate()).padStart(2, '0'); // Asegurar que el día tenga 2 dígitos
@@ -15,6 +16,6 @@ export const convertToDatabaseDate = (dateString: string): string => {
         const parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
         return format(parsedDate, 'yyyy-MM-dd');
     } catch (error) {
-        throw new Error('Formato de fecha no válido');
+        throw new ValidationException('Formato de fecha no válido, debe ser dd/mm/yyyy');
     }
 };

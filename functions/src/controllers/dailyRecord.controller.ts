@@ -20,21 +20,24 @@ export class DailyRecordController {
     createEmptyRecord = async (req: any, res: any) => {
         const { uid, date } = req.body;
 
-        if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+        if (!uid) { 
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
-
+        if (!date) {
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
+        } 
+ 
         // Convertir la fecha al formato `YYYY-MM-DD`
         const formattedDate = convertToDatabaseDate(date);
 
         try {
             await this.dailyRecordService.createEmptyDailyRecord(uid, formattedDate);
-            res.status(201).json({ message: 'Registro diario vacío creado exitosamente' });
+            return res.status(201).json({ message: 'Registro diario vacío creado exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                return res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al crear el registro diario');
+                return res.status(500).json({ message: 'Error desconocido al crear el registro diario' });
             }
         }
     };
@@ -44,11 +47,11 @@ export class DailyRecordController {
         const { uid, date } = req.body;
     
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
     
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
     
         // Convertir la fecha al formato `YYYY-MM-DD`
@@ -56,12 +59,12 @@ export class DailyRecordController {
     
         try {
             const exists = await this.dailyRecordService.recordExists(uid, formattedDate);
-            res.status(200).json({ exists }); // Devuelve verdadero o falso
+            return res.status(200).json({ exists }); // Devuelve verdadero o falso
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                return res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al comprobar el registro diario');
+                return res.status(500).json({ message: 'Error desconocido al comprobar el registro diario' });
             }
         }
     };
@@ -71,11 +74,11 @@ export class DailyRecordController {
         const { uid, date } = req.body;
     
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
-    
+     
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
     
         // Convertir la fecha al formato `YYYY-MM-DD`
@@ -83,12 +86,12 @@ export class DailyRecordController {
     
         try {
             const macros = await this.dailyRecordService.getDailyRecord(uid, formattedDate);
-            res.status(200).json(macros); // Devuelve las macros
+            return res.status(200).json(macros); // Devuelve las macros
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                return res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al obtener las macros del usuario');     
+                return res.status(500).json({ message: 'Error desconocido al obtener el registro diario' });
             }
         }
     };
@@ -99,15 +102,15 @@ export class DailyRecordController {
         const { uid, date, steps } = req.body;
     
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
     
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
     
         if (steps === undefined) {
-            throw new ValidationException('El número de pasos es requerido');
+            return res.status(400).json({ message: 'El número de pasos es requerido' });
         }
     
         // Convertir la fecha al formato `YYYY-MM-DD`
@@ -115,12 +118,12 @@ export class DailyRecordController {
     
         try {
             await this.dailyRecordService.updateSteps(uid, formattedDate, steps);
-            res.status(200).json({ message: 'Pasos actualizados exitosamente' });
+            return res.status(200).json({ message: 'Pasos actualizados exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                return res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al actualizar los pasos');
+                return res.status(500).json({ message: 'Error desconocido al actualizar los pasos' });
             }
         }
     };
@@ -132,15 +135,15 @@ export class DailyRecordController {
         const { uid, date, burnedKcals } = req.body;
     
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
     
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
     
         if (burnedKcals === undefined) {
-            throw new ValidationException('El número de calorías quemadas es requerido');
+            return res.status(400).json({ message: 'El número de calorías quemadas es requerido' });
         }
     
         // Convertir la fecha al formato `YYYY-MM-DD`
@@ -148,12 +151,12 @@ export class DailyRecordController {
     
         try {
             await this.dailyRecordService.updateBurnedKcals(uid, formattedDate, burnedKcals);
-            res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
+            return res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                return res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al actualizar las calorías quemadas');
+                return res.status(500).json({ message: 'Error desconocido al actualizar las calorías quemadas' });
             }
         }
     };
@@ -164,15 +167,15 @@ export class DailyRecordController {
         const { uid, date, steps } = req.body;
     
         if (!uid) {
-            throw new ValidationException('UID del usuario es requerido');
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
     
         if (!date) {
-            throw new ValidationException('La fecha es requerida en formato dd/mm/yyyy');
+            return res.status(400).json({ message: 'La fecha es requerida en formato dd/mm/yyyy' });
         }
     
         if (steps == null) {
-            throw new ValidationException('El número de pasos es requerido');
+            return res.status(400).json({ message: 'El número de pasos es requerido' });
         }
     
         // Convertir la fecha al formato `YYYY-MM-DD`
@@ -180,12 +183,12 @@ export class DailyRecordController {
     
         try {
             await this.dailyRecordService.updateBurnedKcalsFromSteps(uid, formattedDate, steps);
-            res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
+            return res.status(200).json({ message: 'Calorías quemadas actualizadas exitosamente' });
         } catch (error) {
             if (error instanceof Error) {
-                throw new InternalException(error.message);
+                return res.status(500).json({ message: error.message });
             } else {
-                throw new UnknownErrorException('Error desconocido al actualizar las calorías quemadas');
+                return res.status(500).json({ message: 'Error desconocido al actualizar las calorías quemadas' });
             }
         }
     };
@@ -199,17 +202,10 @@ export class DailyRecordController {
         }
 
         try {
-            // Verificar si el usuario existe
-            //const userExists = await this.userService.userExists(uid);
-            
-            /*if (!userExists) {
-                return res.status(404).json({ message: 'El usuario no existe' });
-            }*/
-
             await this.dailyRecordService.updateProcess(uid);
-            res.status(200).json({ message: 'Progreso actualizado correctamente' });
+            return res.status(200).json({ message: 'Progreso actualizado correctamente' });
         } catch (error) {
-            res.status(500).json({ message: error instanceof Error ? error.message : 'Error desconocido ocurrió' });
+            return res.status(500).json({ message: error instanceof Error ? error.message : 'Error desconocido ocurrió' });
         }
     };
     
