@@ -81,6 +81,8 @@ export class AuthController {
     login = async (req: Request, res: Response) => {
         const { email, password } = req.body;
 
+        console.log("hola");
+
         // Validación de entrada
         if (!email || !password) {
             return res.status(400).json({ error: 'Email y contraseña son requeridos' });
