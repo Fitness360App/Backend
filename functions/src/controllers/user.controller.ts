@@ -12,7 +12,7 @@ export class UserController {
 
     // Método para obtener los datos del usuario por ID
     getUserDataByID = async (req: any, res: any) => {
-        const { id } = req.params;  // Obtener el ID del usuario desde los parámetros de la URL
+        const { id } = req.body;  // Obtener el ID del usuario desde los parámetros de la URL
 
         try {
             const userData = await this.userService.getUserDataByID(id);
@@ -30,7 +30,7 @@ export class UserController {
 
     // Método para obtener solo los objetivos del usuario
     getUserGoals = async (req: any, res: any) => {
-        const { id } = req.params;  // Obtener el ID del usuario desde los parámetros de la URL
+        const { id } = req.body;  // Obtener el ID del usuario desde los parámetros de la URL
 
         try {
             const goals = await this.userService.getUserGoals(id);
@@ -51,8 +51,8 @@ export class UserController {
 
 
 
-    /*modifyUserData = async (req: any, res: any) => {
-        const { uid } = req.params;   // Obtener el ID del usuario desde los parámetros de la URL
+    modifyUserData = async (req: any, res: any) => {
+        const { uid } = req.body;   // Obtener el ID del usuario desde los parámetros de la URL
         const updatedData = {   // Crear un objeto separado para los datos actualizados
             name: req.body.name,
             lastName1: req.body.lastName1,
@@ -70,7 +70,7 @@ export class UserController {
             /*const exists = await this.userExists(uid);
             if (!exists) {
                 throw new UserNotFoundException('Usuario no encontrado');
-            }
+            }*/
 
             await this.userService.modifyUserData(uid, updatedData);
             res.status(200).json({ message: 'Datos del usuario actualizados exitosamente' });
@@ -99,7 +99,7 @@ export class UserController {
             
             if (!userExists) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
-            }
+            }*/
 
             // Llama al servicio para actualizar los objetivos del usuario
             await this.userService.modifyUserGoals(uid, updatedGoals);
@@ -116,11 +116,10 @@ export class UserController {
 
     isUserAdmin = async (req: any, res: any) => {
         const { uid } = req.body; // uid pasado en el cuerpo de la solicitud
-        console.log(uid)
 
-        /*try {
-            //const isAdmin = await this.userService.isUserAdmin(uid);
-            //res.status(200).json({ isAdmin });
+        try {
+            const isAdmin = await this.userService.isUserAdmin(uid);
+            res.status(200).json({ isAdmin });
         } catch (error) {
             if (error instanceof Error) {
                 res.status(500).json({ message: error.message });
@@ -128,6 +127,6 @@ export class UserController {
                 res.status(500).json({ message: 'Unknown error occurred' });
             }
         }
-    };*/
+    };
     
 }

@@ -5,17 +5,17 @@ const router = Router();
 const userController = new UserController();
 
 // Ruta para obtener los datos del usuario por ID
-router.get('/:id', userController.getUserDataByID);  // Añadimos una ruta que recibe el ID del usuario en la URL
+router.get('/getUserDataByID', userController.getUserDataByID);  // Añadimos una ruta que recibe el ID del usuario en la URL
 
 // Ruta para obtener solo los objetivos del usuario
-router.get('/:id/goals', userController.getUserGoals); // Añadimos esta línea
+router.get('/getUserGoals', userController.getUserGoals); // Añadimos esta línea
 
 
-//router.put('/modifyUserData', userController.modifyUserData);  // Añadimos una ruta para modificar los datos del usuario
+router.put('/modifyUserData', userController.modifyUserData);  // Añadimos una ruta para modificar los datos del usuario
 
-//router.put('/modifyUserGoals', userController.modifyUserGoals);
+router.put('/modifyUserGoals', userController.modifyUserGoals);
 
 // Ruta para verificar si el usuario es administrador
-//router.get('/isAdmin', userController.isUserAdmin);
+router.get('/isAdmin', userController.isUserAdmin);
 
 export default router;

@@ -70,7 +70,7 @@ export class UserService {
     }
 
 
-    /*async modifyUserData(uid: string, updatedData: Partial<Omit<User2, 'uid' | 'role' | 'macros'>>): Promise<void> {
+    async modifyUserData(uid: string, updatedData: Partial<Omit<User2, 'uid' | 'role' | 'macros'>>): Promise<void> {
         try {
             const userRepository = AppDataSource.getRepository(User2);
             
@@ -112,16 +112,19 @@ export class UserService {
 
     async isUserAdmin(uid: string): Promise<boolean> {
         try {
-            //const userRepository = AppDataSource.getRepository(User2);
-            console.log(uid);
-            // Verifica si el usuario existe
-            /*const user = await userRepository.findOneBy({ uid });
+            // Obtiene el repositorio de usuarios de TypeORM
+            const userRepository = AppDataSource.getRepository(User2);
+
+            // Busca el usuario por `uid`
+            const user = await userRepository.findOneBy({ uid });
+            
+            // Si el usuario no existe, lanza una excepción
             if (!user) {
                 throw new Error('Usuario no encontrado');
             }
-            
-            // Devuelve `true` si el rol es "admin", `false` en caso contrario
-            return true;
+
+            // Retorna `true` si el rol es "admin", de lo contrario `false`
+            return user.role === 'admin';
         } catch (error: unknown) {
             if (error instanceof Error) {
                 throw new Error(`Error al verificar el rol del usuario: ${error.message}`);
@@ -129,7 +132,7 @@ export class UserService {
                 throw new Error('Error desconocido al verificar el rol del usuario');
             }
         }
-    }*/
+    }
     
     
     
