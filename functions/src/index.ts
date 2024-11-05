@@ -26,6 +26,7 @@ initializeDatabase();
 const app = express();
 app.use(bodyParser.json());
 
+
 // Usar las rutas de autenticación
 app.use('/api/auth', authRoutes);
 

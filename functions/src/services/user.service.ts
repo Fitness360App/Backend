@@ -68,4 +68,69 @@ export class UserService {
             }
         }
     }
+
+
+    /*async modifyUserData(uid: string, updatedData: Partial<Omit<User2, 'uid' | 'role' | 'macros'>>): Promise<void> {
+        try {
+            const userRepository = AppDataSource.getRepository(User2);
+            
+            // Verifica si el usuario existe
+            const user = await userRepository.findOneBy({ uid });
+            if (!user) {
+                throw new UserNotFoundException('Usuario no encontrado');
+            }
+    
+            // Actualiza solo los campos permitidos
+            await userRepository.update(uid, updatedData);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new UserNotFoundException(`Error al modificar los datos del usuario: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Error desconocido al modificar los datos del usuario');
+            }
+        }
+    }
+
+
+    async modifyUserGoals(uid: string, updatedGoals: { carbs: number; proteins: number; fats: number; kcals: number }): Promise<void> {
+        const userRepository = AppDataSource.getRepository(User2);
+        
+        // Verifica si el usuario existe
+        const user = await userRepository.findOneBy({ uid });
+        if (!user) {
+            throw new UserNotFoundException('Usuario no encontrado');
+        }
+    
+        // Actualiza los macros
+        await userRepository.update(uid, {
+            carbs: updatedGoals.carbs,
+            proteins: updatedGoals.proteins,
+            fats: updatedGoals.fats,
+            kcals: updatedGoals.kcals
+        });
+    }
+
+    async isUserAdmin(uid: string): Promise<boolean> {
+        try {
+            //const userRepository = AppDataSource.getRepository(User2);
+            console.log(uid);
+            // Verifica si el usuario existe
+            /*const user = await userRepository.findOneBy({ uid });
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+            
+            // Devuelve `true` si el rol es "admin", `false` en caso contrario
+            return true;
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new Error(`Error al verificar el rol del usuario: ${error.message}`);
+            } else {
+                throw new Error('Error desconocido al verificar el rol del usuario');
+            }
+        }
+    }*/
+    
+    
+    
 }

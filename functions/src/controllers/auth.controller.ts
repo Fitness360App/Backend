@@ -48,6 +48,7 @@ export class AuthController {
             // Crear y guardar el usuario en MySQL
             const userRepository = AppDataSource.getRepository(User2);
             const newUser = userRepository.create({
+                uid,
                 email,
                 passwordHash: await bcrypt.hash(password, 10), // Hash de la contraseña
                 name,

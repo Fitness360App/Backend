@@ -11,4 +11,11 @@ router.get('/:id', userController.getUserDataByID);  // Añadimos una ruta que r
 router.get('/:id/goals', userController.getUserGoals); // Añadimos esta línea
 
 
+//router.put('/modifyUserData', userController.modifyUserData);  // Añadimos una ruta para modificar los datos del usuario
+
+//router.put('/modifyUserGoals', userController.modifyUserGoals);
+
+// Ruta para verificar si el usuario es administrador
+//router.get('/isAdmin', userController.isUserAdmin);
+
 export default router;
