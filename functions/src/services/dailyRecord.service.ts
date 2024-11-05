@@ -9,10 +9,14 @@ import {  UserNotFoundException } from "../utils/exceptions/userNotFoundExceptio
 
 import { AppDataSource } from "../ormconfig";
 import { DailyRecord2 } from "../entity/dailryRecord";
+import { Meal2 } from "../entity/meal";
 import { User2 } from "../entity/User";
 import { v4 as uuidv4 } from 'uuid';
 
 export class DailyRecordService {
+
+    private mealRepository = AppDataSource.getRepository(Meal2);
+    private dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
 
 
     async recordExists(uid: string, date: string): Promise<boolean> {
@@ -190,6 +194,80 @@ export class DailyRecordService {
         } catch (error: unknown) {
             throw new DailyRecordException(`Error al actualizar las calorías quemadas desde pasos: ${(error as Error).message}`);
         }
+    }
+
+
+    async updateProcess(uid: string): Promise<void> {
+        // Inicializar variables para los nutrientes
+        let totalKcals = 0;
+        let totalCarbs = 0;
+        let totalProteins = 0;
+        let totalFats = 0;
+
+        // Definir los tipos de comidas que vamos a procesar
+        const mealTypes = ['breakfast', 'lunch', 'snack', 'dinner', 'extras'] as const;
+
+        // Recorrer cada tipo de comida y obtener la comida correspondiente
+        for (const mealType of mealTypes) {
+            try {
+                // Obtener la comida y sus alimentos para el usuario y el tipo de comida
+                const meal = await this.mealRepository.findOne({
+                    where: { uid: uid, type: mealType },
+                    relations: ['foods']
+                });
+        
+                // Verificar si la comida tiene alimentos
+                if (meal && meal.foods) {
+                    // Recorrer cada alimento en la comida y calcular nutrientes
+                    for (const food of meal.foods) {
+                        // Calcular nutrientes proporcionados en base al tamaño de la porción
+                        const nutrients = this.calculateProportionalNutrients(
+                            { kcals: food.kcals, carbs: food.carbs, proteins: food.proteins, fats: food.fats },
+                            food.servingSize
+                        );
+        
+                        // Acumular los nutrientes
+                        totalKcals += nutrients.kcals;
+                        totalCarbs += nutrients.carbs;
+                        totalProteins += nutrients.proteins;
+                        totalFats += nutrients.fats;
+                    }
+                } else {
+                    console.log(`No se encontraron alimentos para el tipo de comida: ${mealType} para el usuario ${uid}`);
+                }
+            } catch (error) {
+                console.log(`No se pudo obtener la comida de tipo ${mealType} para el usuario ${uid}: ${error}`);
+            }
+        }
+
+        // Actualizar el registro diario con los nutrientes calculados
+        const dailyRecord = await this.dailyRecordRepository.findOne({ where: { uid: uid } });
+
+        if (!dailyRecord) {
+            throw new Error(`No se encontró el registro diario para el usuario ${uid}`);
+        }
+
+        // Actualizar el registro con los nutrientes calculados
+        dailyRecord.consumedKcals = totalKcals;
+        dailyRecord.consumedCarbs = totalCarbs;
+        dailyRecord.consumedProteins = totalProteins;
+        dailyRecord.consumedFats = totalFats;
+
+        await this.dailyRecordRepository.save(dailyRecord);
+    }
+
+    // Calcula los nutrientes proporcionados en base a la porción
+    calculateProportionalNutrients(
+        food: { kcals: number; carbs: number; proteins: number; fats: number },
+        servingSize: number
+    ) {
+        const factor = servingSize / 100; // Proporción en base a 100g
+        return {
+            kcals: food.kcals * factor,
+            carbs: food.carbs * factor,
+            proteins: food.proteins * factor,
+            fats: food.fats * factor
+        };
     }
 
 

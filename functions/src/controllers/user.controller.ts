@@ -27,6 +27,16 @@ export class UserController {
         }
     };
 
+    userExists = async (uid: string): Promise<boolean> => {
+        try {
+            const userData = await this.userService.getUserDataByID(uid);
+            return !!userData;  // Devolver true si existe, false si no
+        } catch (error) {
+            // Puedes manejar excepciones específicas o simplemente lanzar el error
+            return false;
+        }
+    };
+
 
     // Método para obtener solo los objetivos del usuario
     getUserGoals = async (req: any, res: any) => {
@@ -67,10 +77,10 @@ export class UserController {
 
         try {
             // Verificar si el usuario existe antes de modificar
-            /*const exists = await this.userExists(uid);
+            const exists = await this.userExists(uid);
             if (!exists) {
                 throw new UserNotFoundException('Usuario no encontrado');
-            }*/
+            }
 
             await this.userService.modifyUserData(uid, updatedData);
             res.status(200).json({ message: 'Datos del usuario actualizados exitosamente' });
@@ -95,11 +105,11 @@ export class UserController {
 
         try {
             // Verifica si el usuario existe
-            /*const userExists = await this.userExists(uid);
+            const userExists = await this.userExists(uid);
             
             if (!userExists) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
-            }*/
+            }
 
             // Llama al servicio para actualizar los objetivos del usuario
             await this.userService.modifyUserGoals(uid, updatedGoals);
