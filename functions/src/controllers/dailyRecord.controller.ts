@@ -68,7 +68,7 @@ export class DailyRecordController {
 
     // Método para obtener el dailyRecord del usuario
     getDailyRecord = async (req: any, res: any) => {
-        const { uid, date } = req.body;
+        const { uid, date } = req.params;
     
         if (!uid) {
             return res.status(400).json({ message: 'UID del usuario es requerido' });

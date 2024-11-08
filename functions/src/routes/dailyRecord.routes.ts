@@ -12,7 +12,7 @@ router.post('/create', (req, res) => dailyRecordController.createEmptyRecord(req
 router.get('/check', (req, res) => dailyRecordController.checkRecordExists(req, res));
 
 // Ruta para obtener el dailyRecord del usuario
-router.get('/getdailyRecord', (req, res) => dailyRecordController.getDailyRecord(req, res));
+router.get('/getdailyRecord/:uid/:date', (req, res) => dailyRecordController.getDailyRecord(req, res));
 
 // Ruta para actualizar los pasos
 router.put('/updateSteps', dailyRecordController.updateSteps);
