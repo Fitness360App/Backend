@@ -10,10 +10,10 @@ export class UserController {
 
     // Método para obtener los datos del usuario por ID
     getUserDataByID = async (req: any, res: any) => {
-        const { id } = req.body;  // Obtener el ID del usuario desde los parámetros de la URL
-
+        const { uid } = req.params;  // Obtener el ID del usuario desde los parámetros de la URL
+        
         try {
-            const userData = await this.userService.getUserDataByID(id);
+            const userData = await this.userService.getUserDataByID(uid);
 
             if (!userData) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
