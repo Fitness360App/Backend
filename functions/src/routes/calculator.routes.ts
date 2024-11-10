@@ -3,9 +3,9 @@ import calculatorController from '../controllers/calculator.controller';
 
 const router = Router();
 
-router.get('/calculateIMC', calculatorController.calculateIMCByUserData);
+router.get('/calculateIMC/:uid', calculatorController.calculateIMCByUserData);
 
-router.get('/calculateMacros', calculatorController.calculateMacrosByUserData);
+router.get('/calculateMacros/:uid', calculatorController.calculateMacrosByUserData);
 
 
 export default router;

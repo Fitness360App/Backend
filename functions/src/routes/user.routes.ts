@@ -16,6 +16,6 @@ router.put('/modifyUserData', userController.modifyUserData);  // Añadimos una 
 router.put('/modifyUserGoals', userController.modifyUserGoals);
 
 // Ruta para verificar si el usuario es administrador
-router.get('/isAdmin', userController.isUserAdmin);
+router.get('/isAdmin/:uid', userController.isUserAdmin);
 
 export default router;

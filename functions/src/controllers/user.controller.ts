@@ -122,7 +122,7 @@ export class UserController {
     };
 
     isUserAdmin = async (req: any, res: any) => {
-        const { uid } = req.body; // uid pasado en el cuerpo de la solicitud
+        const { uid } = req.params; // uid pasado en el cuerpo de la solicitud
 
         try {
             const isAdmin = await this.userService.isUserAdmin(uid);

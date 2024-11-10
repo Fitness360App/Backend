@@ -13,7 +13,7 @@ class CalculatorController {
 
     public calculateIMCByUserData = async (req: Request, res: Response) => {
         try {
-            const { uid } = req.body;
+            const { uid } = req.params;
             const user = await this.userService.getUserDataByID(uid);
             if (!user) {
                 return res.status(404).json({ error: "Usuario no encontrado" });
@@ -27,7 +27,7 @@ class CalculatorController {
 
     public calculateMacrosByUserData = async (req: Request, res: Response) => {
         try {
-            const { uid } = req.body;
+            const { uid } = req.params;
             const userData = await this.userService.getUserDataByID(uid);
             if (!userData) {
                 return res.status(404).json({ error: "Usuario no encontrado" });
