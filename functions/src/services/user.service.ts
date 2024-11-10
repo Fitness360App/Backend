@@ -25,7 +25,7 @@ export class UserService {
             if (!user) {
                 throw new UserNotFoundException('Usuario no encontrado'); // Si no se encuentra el usuario
             }
-    
+            console.log(user);
             return user; // Retorna los datos del usuario si existe
         } catch (error: unknown) {
             if (error instanceof Error) {
