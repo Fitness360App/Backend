@@ -10,6 +10,32 @@ export class MealController {
         this.mealService = new MealService();
     }
 
+
+    getMealWithFoods = async (req: any, res: any) => {
+        const { uid, type } = req.params;   
+
+        // Validación de parámetros
+        if (!uid) {
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
+        }
+
+        if (!type) {
+            return res.status(400).json({ message: 'El tipo de comida es requerido' });
+        }
+
+        try {
+            const meal = await this.mealService.getMealWithFoods(uid, type);
+
+            if (!meal) {
+                return res.status(404).json({ message: `No se encontró una comida de tipo ${type} para el usuario ${uid}` });
+            }
+
+            return res.status(200).json(meal); // Devuelve la comida con los alimentos
+        } catch (error) {
+            return res.status(500).json({ error: 'Error al obtener la comida con alimentos' });
+        }
+    };
+
     // Controller method to add a food item to a meal
     addFoodToMeal = async (req: any, res: any) => {
         const { barcode, uid, type } = req.body;
