@@ -16,4 +16,6 @@ router.delete('/remove', mealController.removeFoodFromMeal)
 
 router.put('/edit', mealController.editFoodInMeal);
 
+router.get('/get-meal/:uid/:type', mealController.getMealWithFoods);
+
 export default router;
