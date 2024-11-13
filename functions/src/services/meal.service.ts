@@ -3,6 +3,7 @@ import { Meal } from '../models/meal.model';
 import { generateMealID } from '../utils/idGenerator';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { FoodService } from './food.service';
+import { MealFood } from "../entity/mealfood";
 
 //import { MealException } from '../utils/exceptions/mealException';
 
@@ -15,26 +16,30 @@ export class MealService {
     private foodService = new FoodService();
 
 
-
-    async getMealWithFoods(uid: string, mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' ) {
+    async getMealWithFoods(uid: string, mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' ): Promise<{ food: Food2, servingSize: number }[] | null> {
         try {
             // Verifica si el Meal existe primero
             const exists = await this.mealExists(uid, mealType);
-
+    
             if (!exists) {
-                // Si no existe, retorna null o lanza un error
-                return null; // O lanzar un error como: throw new Error(`Meal of type ${mealType} not found for user ${uid}`);
+                // Si no existe, retorna null
+                return null; 
             }
-
-            // Si existe, obtenemos el meal con los alimentos asociados
+    
+            // Si existe, obtenemos el meal con los alimentos asociados a través de MealFood
             const mealRepository = AppDataSource.getRepository(Meal2);
             const meal = await mealRepository.findOne({
                 where: { uid, type: mealType },
-                relations: ['foods'], // Incluye los alimentos asociados
+                relations: ['mealFoods', 'mealFoods.food'], // Incluye MealFood y Food2 relacionados
             });
 
+    
             if (meal) {
-                return meal.foods; // Devuelve la comida con los alimentos
+                // Mapea cada MealFood a un objeto con el alimento y su tamaño de porción específico
+                return meal.mealFoods.map(mealFood => ({
+                    food: mealFood.food,
+                    servingSize: mealFood.servingSize
+                }));
             } else {
                 throw new UnknownErrorException(`Meal of type ${mealType} not found for user ${uid}`);
             }
@@ -46,9 +51,9 @@ export class MealService {
             }
         }
     }
+    
 
     async mealExists(uid: string, type: string): Promise<boolean> {
-        console.log(uid, type);
     
         // Obtén el repositorio de Meal
         const mealRepository = AppDataSource.getRepository(Meal2);
@@ -61,25 +66,30 @@ export class MealService {
     }
 
 
-    async addFoodToMeal(barcode: string, userId: string, mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras'): Promise<void> {
+    async addFoodToMeal(
+        barcode: string,
+        userId: string,
+        mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'extras',
+        servingSize: number
+    ): Promise<void> {
         try {
-            // Obtén el repositorio de Meal y Food
             const mealRepository = AppDataSource.getRepository(Meal2);
             const foodRepository = AppDataSource.getRepository(Food2);
+            const mealFoodRepository = AppDataSource.getRepository(MealFood);
     
             // Verifica si la comida ya existe para el usuario y el tipo de comida
             let meal = await mealRepository.findOne({
                 where: { uid: userId, type: mealType },
-                relations: ["foods"], // Incluye la relación con los alimentos
+                relations: ["mealFoods"],
             });
     
             if (!meal) {
                 // Si la comida no existe, crea una nueva
                 meal = mealRepository.create({
-                    id: generateMealID(), // Genera un nuevo ID para la comida
+                    id: generateMealID(),
                     type: mealType,
                     uid: userId,
-                    foods: [],
+                    mealFoods: []
                 });
                 await mealRepository.save(meal);
             }
@@ -90,9 +100,30 @@ export class MealService {
                 throw new UnknownErrorException(`Food item with barcode ${barcode} not found.`);
             }
     
-            // Agrega el alimento a la comida (relación many-to-many)
-            meal.foods.push(food);
-            await mealRepository.save(meal); // Guarda la comida actualizada con el nuevo alimento
+            // Verifica si ya existe el alimento en el `MealFood` para evitar duplicados
+            const existingMealFood = await mealFoodRepository.findOne({
+                where: {
+                    meal: meal,
+                    food: food
+                }
+            });
+    
+            if (existingMealFood) {
+                throw new UnknownErrorException(`Food item with barcode ${barcode} already exists in the meal.`);
+            }
+    
+            // Si no existe, crea una nueva instancia de MealFood
+            const mealFood = mealFoodRepository.create({
+                meal: meal,
+                food: food,
+                servingSize: servingSize
+            });
+
+            console.log("===================================\n")
+            console.log(mealFood);
+    
+            // Guarda la instancia de MealFood en la base de datos
+            await mealFoodRepository.save(mealFood);
     
         } catch (error) {
             if (error instanceof Error) {
@@ -102,6 +133,7 @@ export class MealService {
             }
         }
     }
+    
 
 
     async removeFoodFromMeal(
@@ -111,22 +143,33 @@ export class MealService {
     ): Promise<void> {
         try {
             const mealRepository = AppDataSource.getRepository(Meal2);
-
+            const mealFoodRepository = AppDataSource.getRepository(MealFood);
+    
             // Verificar si existe un meal del tipo especificado para el usuario
             const meal = await mealRepository.findOne({
-                where: { uid: userId, type: mealType },
-                relations: ['foods'],
+                where: { uid: userId, type: mealType }
             });
 
+            console.log(meal);
+    
             if (!meal) {
                 throw new UnknownErrorException(`No existe un meal de tipo ${mealType} para el usuario ${userId}.`);
             }
-
-            // Filtrar el alimento a eliminar
-            meal.foods = meal.foods.filter(food => food.barcode !== barcode);
-
-            // Guardar los cambios en la base de datos
-            await mealRepository.save(meal);
+    
+            // Verificar si el alimento está asociado con el meal específico
+            const mealFoodRelation = await mealFoodRepository.findOne({
+                where: { meal: { id: meal.id }, food: { barcode: barcode } },
+                relations: ['meal', 'food']
+            });
+    
+            if (!mealFoodRelation) {
+                throw new UnknownErrorException(`El alimento con código de barras ${barcode} no está asociado con el meal de tipo ${mealType}.`);
+            }
+    
+            // Eliminar la relación específica en MealFood
+            await mealFoodRepository.remove(mealFoodRelation);
+    
+            console.log(`Alimento con código de barras ${barcode} eliminado exitosamente del meal de tipo ${mealType}.`);
         } catch (error) {
             if (error instanceof Error) {
                 throw new UnknownErrorException(`Error removing food from meal: ${error.message}`);
@@ -135,6 +178,7 @@ export class MealService {
             }
         }
     }
+    
 
 
     async editFoodFromMeal(
@@ -145,30 +189,31 @@ export class MealService {
     ): Promise<void> {
         try {
             const mealRepository = AppDataSource.getRepository(Meal2);
+            const mealFoodRepository = AppDataSource.getRepository(MealFood);
     
             // Verificar si existe un meal del tipo especificado para el usuario
             const meal = await mealRepository.findOne({
                 where: { uid: userId, type: mealType },
-                relations: ['foods'],
+                relations: ['mealFoods', 'mealFoods.food'], // Incluir la relación con mealFoods y food
             });
     
             if (!meal) {
                 throw new UnknownErrorException(`No existe un meal de tipo ${mealType} para el usuario ${userId}.`);
             }
     
-            // Buscar el alimento con el código de barras proporcionado
-            const food = meal.foods.find(food => food.barcode === barcode);
+            // Buscar el registro MealFood con el código de barras proporcionado
+            const mealFood = meal.mealFoods.find(mealFood => mealFood.food.barcode === barcode);
     
-            if (!food) {
+            if (!mealFood) {
                 throw new UnknownErrorException(`No se encontró el alimento con código de barras ${barcode} en el meal.`);
             }
     
-            // Actualizar el tamaño de la porción
-            food.servingSize = newSize;
-            //console.log(food);
+            // Actualizar el tamaño de la porción en MealFood
+            mealFood.servingSize = newSize;
+
     
             // Guardar los cambios en la base de datos
-            await AppDataSource.getRepository(Food2).save(food);
+            await mealFoodRepository.save(mealFood);
         } catch (error) {
             if (error instanceof Error) {
                 throw new UnknownErrorException(`Error editing food in meal: ${error.message}`);
@@ -177,6 +222,7 @@ export class MealService {
             }
         }
     }
+    
 
     // Método para eliminar todas los daily record de un usuario
     async deleteAllMeals(uid: string): Promise<void> {

@@ -38,9 +38,11 @@ export class MealController {
 
     // Controller method to add a food item to a meal
     addFoodToMeal = async (req: any, res: any) => {
-        const { barcode, uid, type } = req.body;
+        const { barcode, uid, type, servingSize } = req.body;
+        console.log("===================================\n")
+        console.log(barcode, uid, type, servingSize);
         try {
-            await this.mealService.addFoodToMeal(barcode, uid, type);
+            await this.mealService.addFoodToMeal(barcode, uid, type, servingSize);
             return res.status(200).json({ message: 'Food item added to meal successfully' });
         } catch (error) {
             return res.status(500).json({ error: 'Error adding food to meal' });
@@ -72,7 +74,7 @@ export class MealController {
     };
 
     removeFoodFromMeal = async (req: any, res: any) => {
-        const { barcode, uid, type } = req.body;
+        const { barcode, uid, type } = req.query;
         const requiredFields = [
             { field: 'uid', message: 'UID del usuario es requerido' },
             { field: 'barcode', message: 'El código de barras del alimento es requerido' },
@@ -80,7 +82,7 @@ export class MealController {
         ];
 
         for (const { field, message } of requiredFields) {
-            if (!req.body[field]) {
+            if (!req.query[field]) {
             return res.status(400).json({ message });
             }
         }
