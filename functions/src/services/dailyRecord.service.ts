@@ -270,5 +270,21 @@ export class DailyRecordService {
         };
     }
 
+    // Método para eliminar todas los daily record de un usuario
+    async deleteAllDailyRecords(uid: string): Promise<void> {
+        try {
+            // Obtén el repositorio de DailyRecord
+            const dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
+    
+            // Elimina todos los registros diarios del usuario
+            await dailyRecordRepository.delete({ uid });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new DailyRecordException(`Error al eliminar los registros diarios: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Error desconocido al eliminar los registros diarios');
+            }
+        }
+    }
 
 }
