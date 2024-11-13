@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { MealFood } from './mealfood';
+
 
 @Entity()
 export class Food2 {
@@ -26,4 +28,7 @@ export class Food2 {
 
     @Column("float", { default: 0 })
     kcals!: number;
+
+    @OneToMany(() => MealFood, mealFood => mealFood.food)
+    mealFoods!: MealFood[]; // Relación con MealFood
 }
