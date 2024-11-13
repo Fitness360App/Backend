@@ -178,6 +178,26 @@ export class MealService {
         }
     }
 
+    // Método para eliminar todas los daily record de un usuario
+    async deleteAllMeals(uid: string): Promise<void> {
+        try {
+            // Obtén el repositorio de Meal
+            const mealRepository = AppDataSource.getRepository(Meal2);
     
+            // Busca todas las comidas del usuario
+            const meals = await mealRepository.find({ where: { uid } });
+    
+            // Elimina cada comida
+            for (const meal of meals) {
+                await mealRepository.remove(meal);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new UnknownErrorException(`Error deleting all meals: ${error.message}`);
+            } else {
+                throw new UnknownErrorException('Unknown error deleting all meals.');
+            }
+        }
+    }
     
 }

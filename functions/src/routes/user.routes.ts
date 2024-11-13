@@ -18,4 +18,6 @@ router.put('/modifyUserGoals', userController.modifyUserGoals);
 // Ruta para verificar si el usuario es administrador
 router.get('/isAdmin/:uid', userController.isUserAdmin);
 
+router.delete('/deleteUser/:uid', userController.deleteUser);
+
 export default router;

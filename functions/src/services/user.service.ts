@@ -4,14 +4,21 @@ import { firestore } from 'firebase-admin';
 import { User } from '../models/user.model';
 import { UnknownErrorException } from '../utils/exceptions/unknownErrorException';
 import { UserNotFoundException } from '../utils/exceptions/userNotFoundException';
-
 import { User2} from '../entity/User';
 import { AppDataSource } from '../ormconfig';
+import { DailyRecordService } from './dailyRecord.service';
+import { MealService } from './meal.service';
 
 
 export class UserService {
-    //private userCollection = firestore().collection('users');
 
+    private dailyRecordService: DailyRecordService;
+    private mealService: MealService;
+
+    constructor() {
+        this.dailyRecordService = new DailyRecordService();
+        this.mealService = new MealService();
+    }
 
 
     async getUserDataByID(id_usuario: string): Promise<User | null> {
@@ -134,6 +141,32 @@ export class UserService {
         }
     }
     
-    
+    async deleteUser(uid: string): Promise<void> {
+        try {
+            // Obtiene el repositorio de usuarios de TypeORM
+            const userRepository = AppDataSource.getRepository(User2);
+
+            // Busca el usuario por `uid`
+            const user = await userRepository.findOneBy({ uid });
+            
+            // Si el usuario no existe, lanza una excepción
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+
+           
+            // Elimina al usuario y todos sus meals y dailyrecords asociados (deleteAllDailyRecords y deleteAllMeals)
+            await this.dailyRecordService.deleteAllDailyRecords(uid);
+            await this.mealService.deleteAllMeals(uid);
+            await userRepository.remove(user);
+
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new Error(`Error al eliminar el usuario: ${error.message}`);
+            } else {
+                throw new Error('Error desconocido al eliminar el usuario');
+            }
+        }
+    }
     
 }

@@ -137,4 +137,27 @@ export class UserController {
         }
     };
     
+
+    deleteUser = async (req: any, res: any) => {
+        const { uid } = req.params; 
+
+        try {
+            // Verifica si el usuario existe
+            const userExists = await this.userExists(uid);
+            if (!userExists) {
+                return res.status(404).json({ message: 'Usuario no encontrado' });
+            }
+
+            // Llama al servicio para eliminar el usuario
+            await this.userService.deleteUser(uid);
+
+            return res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+        } catch (error) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Error desconocido ocurrió' });
+            }
+        }
+    };
 }
