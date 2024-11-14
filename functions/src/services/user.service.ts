@@ -157,7 +157,9 @@ export class UserService {
            
             // Elimina al usuario y todos sus meals y dailyrecords asociados (deleteAllDailyRecords y deleteAllMeals)
             await this.dailyRecordService.deleteAllDailyRecords(uid);
+            console.log("Eliminado DAILY RECORDS");
             await this.mealService.deleteAllMeals(uid);
+            console.log("Eliminado MEALS");
             await userRepository.remove(user);
 
         } catch (error: unknown) {

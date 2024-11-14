@@ -229,9 +229,17 @@ export class MealService {
         try {
             // Obtén el repositorio de Meal
             const mealRepository = AppDataSource.getRepository(Meal2);
+            const mealFoodRepository = AppDataSource.getRepository(MealFood);
     
             // Busca todas las comidas del usuario
-            const meals = await mealRepository.find({ where: { uid } });
+            const meals = await mealRepository.find({ where: { uid: uid } });
+            // Obtén todos los MealFood asociados a cada comida y elimínalos
+            for (const meal of meals) {
+                const mealFoods = await mealFoodRepository.find({ where: { meal: { id: meal.id } } });
+                for (const mealFood of mealFoods) {
+                    await mealFoodRepository.remove(mealFood);
+                }
+            }
     
             // Elimina cada comida
             for (const meal of meals) {
