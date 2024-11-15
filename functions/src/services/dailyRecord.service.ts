@@ -12,11 +12,14 @@ import { DailyRecord2 } from "../entity/dailryRecord";
 import { Meal2 } from "../entity/meal";
 import { User2 } from "../entity/User";
 import { v4 as uuidv4 } from 'uuid';
+import { MealFood } from "../entity/mealfood";
+import { MealService } from './meal.service';
 
 export class DailyRecordService {
 
     private mealRepository = AppDataSource.getRepository(Meal2);
     private dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
+    private mealService = new MealService();
 
 
     async recordExists(uid: string, date: string): Promise<boolean> {
@@ -88,6 +91,8 @@ export class DailyRecordService {
         if (recordExists) {
             throw new DailyRecordException(`Ya existe un registro diario para la fecha ${formattedDate}`);
         }
+
+        await this.mealService.deleteAllMeals(uid);
     
         // Crear un registro diario vacío
         const dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
@@ -203,29 +208,43 @@ export class DailyRecordService {
         let totalCarbs = 0;
         let totalProteins = 0;
         let totalFats = 0;
-
+    
         // Definir los tipos de comidas que vamos a procesar
-        const mealTypes = ['breakfast', 'lunch', 'snack', 'dinner', 'extras'] as const;
-
+        const mealTypes = ['breakfast', 'lunch', 'snack', 'dinner'] as const;
+    
+        // Repositorios necesarios
+        const mealRepository = AppDataSource.getRepository(Meal2);
+        const mealFoodRepository = AppDataSource.getRepository(MealFood);
+    
         // Recorrer cada tipo de comida y obtener la comida correspondiente
         for (const mealType of mealTypes) {
             try {
-                // Obtener la comida y sus alimentos para el usuario y el tipo de comida
-                const meal = await this.mealRepository.findOne({
-                    where: { uid: uid, type: mealType },
-                    relations: ['foods']
+                // Obtener la comida del usuario y el tipo de comida
+                const meal = await mealRepository.findOne({
+                    where: { uid, type: mealType },
+                    relations: ['mealFoods', 'mealFoods.food'], // Incluir MealFood y Food2 relacionados
                 });
-        
+                
+    
+                console.log(meal);
+    
                 // Verificar si la comida tiene alimentos
-                if (meal && meal.foods) {
-                    // Recorrer cada alimento en la comida y calcular nutrientes
-                    for (const food of meal.foods) {
+                if (meal && meal.mealFoods.length > 0) {
+                    // Recorrer cada relación MealFood en la comida y calcular nutrientes
+                    for (const mealFood of meal.mealFoods) {
+                        const food = mealFood.food;
+    
                         // Calcular nutrientes proporcionados en base al tamaño de la porción
                         const nutrients = this.calculateProportionalNutrients(
-                            { kcals: food.kcals, carbs: food.carbs, proteins: food.proteins, fats: food.fats },
-                            food.servingSize
+                            {
+                                kcals: food.kcals,
+                                carbs: food.carbs,
+                                proteins: food.proteins,
+                                fats: food.fats,
+                            },
+                            mealFood.servingSize // Usar el tamaño de la porción especificado en MealFood
                         );
-        
+    
                         // Acumular los nutrientes
                         totalKcals += nutrients.kcals;
                         totalCarbs += nutrients.carbs;
@@ -239,22 +258,23 @@ export class DailyRecordService {
                 console.log(`No se pudo obtener la comida de tipo ${mealType} para el usuario ${uid}: ${error}`);
             }
         }
-
+    
         // Actualizar el registro diario con los nutrientes calculados
-        const dailyRecord = await this.dailyRecordRepository.findOne({ where: { uid: uid } });
-
+        const dailyRecord = await this.dailyRecordRepository.findOne({ where: { uid } });
+    
         if (!dailyRecord) {
             throw new Error(`No se encontró el registro diario para el usuario ${uid}`);
         }
-
+    
         // Actualizar el registro con los nutrientes calculados
         dailyRecord.consumedKcals = totalKcals;
         dailyRecord.consumedCarbs = totalCarbs;
         dailyRecord.consumedProteins = totalProteins;
         dailyRecord.consumedFats = totalFats;
-
+    
         await this.dailyRecordRepository.save(dailyRecord);
     }
+    
 
     // Calcula los nutrientes proporcionados en base a la porción
     calculateProportionalNutrients(
