@@ -192,7 +192,7 @@ export class DailyRecordController {
 
 
     updateNutrients = async (req: any, res: any) => {
-        const { uid } = req.body;
+        const { uid } = req.params;
 
         if (!uid) {
             return res.status(400).json({ message: 'UID del usuario es requerido' });
