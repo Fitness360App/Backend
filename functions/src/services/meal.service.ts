@@ -82,6 +82,7 @@ export class MealService {
                 where: { uid: userId, type: mealType },
                 relations: ["mealFoods"],
             });
+
     
             if (!meal) {
                 // Si la comida no existe, crea una nueva
@@ -96,6 +97,7 @@ export class MealService {
     
             // Busca el alimento por código de barras
             const food = await foodRepository.findOneBy({ barcode });
+
             if (!food) {
                 throw new UnknownErrorException(`Food item with barcode ${barcode} not found.`);
             }
@@ -107,6 +109,8 @@ export class MealService {
                     food: food
                 }
             });
+
+            console.log(existingMealFood)
     
             if (existingMealFood) {
                 throw new UnknownErrorException(`Food item with barcode ${barcode} already exists in the meal.`);
@@ -119,8 +123,7 @@ export class MealService {
                 servingSize: servingSize
             });
 
-            console.log("===================================\n")
-            console.log(mealFood);
+ 
     
             // Guarda la instancia de MealFood en la base de datos
             await mealFoodRepository.save(mealFood);

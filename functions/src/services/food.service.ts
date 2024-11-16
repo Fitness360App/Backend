@@ -107,4 +107,31 @@ export class FoodService {
             throw new FoodServiceException('Error al crear el alimento');
         }
     }
+
+
+
+    async getFeaturedFoods(): Promise<Food[]> {
+        try {
+            const foodRepository = AppDataSource.getRepository(Food2);
+    
+            // Puedes ajustar el criterio de alimentos destacados
+            const foods = await foodRepository
+                .createQueryBuilder('food')
+                .orderBy('food.name', 'ASC') // Ordenar alfabéticamente
+                .limit(10) // Limitar a 10 alimentos
+                .getMany();
+    
+            return foods.map(food => ({
+                ...food,
+                nutrients: {
+                    carbs: food.carbs,
+                    proteins: food.proteins,
+                    fats: food.fats,
+                    kcals: food.kcals,
+                },
+            }));
+        } catch (error) {
+            throw new FoodServiceException('Error al obtener alimentos destacados');
+        }
+    }
 }

@@ -12,4 +12,6 @@ router.get('/search/name/:name', foodController.searchFoodByName);
 // Nueva ruta para crear un alimento
 router.post('/create', foodController.createFood);
 
+router.get('/featured', foodController.getFeaturedFoods);
+
 export default router;

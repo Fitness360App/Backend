@@ -109,4 +109,24 @@ export class FoodController {
             }
         }
     };
+
+
+
+    getFeaturedFoods = async (req: Request, res: Response) => {
+        try {
+            const foods = await this.foodService.getFeaturedFoods();
+    
+            if (foods.length === 0) {
+                return res.status(404).json({ message: 'No featured foods available' });
+            }
+    
+            return res.status(200).json(foods);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Unknown error occurred' });
+            }
+        }
+    };
 }
