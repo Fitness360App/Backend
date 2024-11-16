@@ -38,6 +38,7 @@ export class MealController {
 
     // Controller method to add a food item to a meal
     addFoodToMeal = async (req: any, res: any) => {
+        console.log("ENTRO A ADD FOOD TO MEAL")
         const { barcode, uid, type, servingSize } = req.body;
         console.log("===================================\n")
         console.log(barcode, uid, type, servingSize);
