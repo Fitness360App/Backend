@@ -1,5 +1,6 @@
 import { UserService } from '../services/user.service';
 import { UserNotFoundException } from '../utils/exceptions/userNotFoundException';
+import * as bcrypt from 'bcrypt';
 
 export class UserController {
     private userService: UserService;
@@ -160,4 +161,70 @@ export class UserController {
             }
         }
     };
+
+    checkUserEmail = async (req: any, res: any) => {
+        const { email } = req.params; 
+
+        try {
+            const exists = await this.userService.checkUserEmail(email);
+            console.log("Existe:",exists)
+            return res.status(200).send(exists);
+        } catch (error) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Error desconocido ocurrió' });
+            }
+        }
+    };
+
+    // Método para enviar un correo de confirmación
+    sendEmailConfirmation = async (req: any, res: any) => {
+        const { uid, password, oldpassword } = req.body; 
+
+        try {
+            //Obtener el usuario por ID
+            const user = await this.userService.getUserDataByID(uid) as any;
+
+            /*const isOldPasswordCorrect = await bcrypt.compare("123456Aa@", user.passwordHash);
+
+            
+            if (!isOldPasswordCorrect) {
+                console.log("Contraseña antigua incorrecta")
+                return res.status(401).json({ message: 'Contraseña antigua incorrecta' });
+            }*/
+
+            // Llama al servicio para cambiar la contraseña del usuario
+            const validationCode = await this.userService.sendEmailConfirmation(uid, password);
+
+            //Devolver el codigo de validacion junto a un 200
+            console.log("Codigo de validacion:",validationCode)
+            return res.status(200).send(validationCode); // Devuelve solo el código como texto
+        } catch (error) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Error desconocido ocurrió' });
+            }
+        }
+    };
+
+    // Método para cambiar la contraseña del usuario
+    changePassword = async (req: any, res: any) => {
+        const { uid, password } = req.body; 
+
+        try {
+            console.log("UID:",uid)
+            console.log("Password:",password)
+            await this.userService.changePassword(uid, password);
+            return res.status(200).json({ message: 'Contraseña cambiada exitosamente' });
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log(error)
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Error desconocido ocurrió' });
+            }
+        }
+    }
 }
