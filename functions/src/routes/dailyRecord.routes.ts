@@ -20,7 +20,7 @@ router.put('/updateSteps', dailyRecordController.updateSteps);
 // Ruta para actualizar las calorías quemadas
 router.put('/updateBurnedKcals', dailyRecordController.updateBurnedKcals);
 
-router.post('/updateBurnedKcalsFromSteps', dailyRecordController.updateBurnedKcalsFromSteps);
+router.put('/updateBurnedKcalsFromSteps', dailyRecordController.updateBurnedKcalsFromSteps);
 
 router.post('/updateNutrients/:uid', dailyRecordController.updateNutrients)
 

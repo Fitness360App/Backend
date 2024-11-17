@@ -44,8 +44,8 @@ app.use('/api/meal', mealRoutes);
 // Opción de escuchar en un puerto local para pruebas (opcional)
 const PORT = process.env.PORT || 3000; // Puedes usar cualquier puerto que desees
 if (process.env.NODE_ENV !== 'production') { // Solo en desarrollo
-    app.listen(PORT, () => {
-        console.log(`Servidor escuchando en http://localhost:${PORT}`);
+    app.listen(3000, '0.0.0.0', () => {
+        console.log('Server running on port 3000');
     });
 }
 
