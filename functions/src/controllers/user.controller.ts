@@ -65,14 +65,15 @@ export class UserController {
         const updatedData = {   
             name: req.body.name,
             lastName1: req.body.lastName1,
-            lastName2: req.body.lastName2,
             actualWeight: req.body.actualWeight,
             goalWeight: req.body.goalWeight,
             height: req.body.height,
             age: req.body.age,
-            gender: req.body.gender,
             activityLevel: req.body.activityLevel,
         };
+
+
+        console.log("Esto es el updatedData:",updatedData)
 
         try {
             // Verificar si el usuario existe antes de modificar
@@ -95,11 +96,13 @@ export class UserController {
 
     modifyUserGoals = async (req: any, res: any) => {
         const { uid } = req.body; // Obtener el ID del usuario desde el cuerpo de la solicitud
+
+        console.log("UID:",uid)
         const updatedGoals = {   // Crear un objeto para los nuevos objetivos de macros
-            carbs: req.body.macros.carbs,
-            proteins: req.body.macros.proteins,
-            fats: req.body.macros.fats,
-            kcals: req.body.macros.kcals,
+            carbs: req.body.carbs,
+            proteins: req.body.proteins,
+            fats: req.body.fats,
+            kcals: req.body.kcals,
         };
 
         try {
@@ -115,6 +118,8 @@ export class UserController {
 
             return res.status(200).json({ message: 'Objetivos del usuario actualizados exitosamente' });
         } catch (error) {
+
+
             if (error instanceof Error) {
                 return res.status(500).json({ message: error.message });
             } else {

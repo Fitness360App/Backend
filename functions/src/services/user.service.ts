@@ -103,13 +103,21 @@ export class UserService {
 
     async modifyUserGoals(uid: string, updatedGoals: { carbs: number; proteins: number; fats: number; kcals: number }): Promise<void> {
         const userRepository = AppDataSource.getRepository(User2);
+
+        console.log(userRepository)
         
+        console.log("==================================")
+
+        console.log("HOLA2")
+
+
         // Verifica si el usuario existe
         const user = await userRepository.findOneBy({ uid });
         if (!user) {
             throw new UserNotFoundException('Usuario no encontrado');
         }
     
+        console.log("Esto es el updatedGoals:",updatedGoals)
         // Actualiza los macros
         await userRepository.update(uid, {
             carbs: updatedGoals.carbs,
@@ -209,6 +217,7 @@ export class UserService {
                     rejectUnauthorized: false, // Desactiva la validación del certificado (no recomendado en producción)
                 }
             });
+
 
     
             const mailOptions = {
