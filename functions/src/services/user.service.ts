@@ -8,6 +8,8 @@ import { User2} from '../entity/User';
 import { AppDataSource } from '../ormconfig';
 import { DailyRecordService } from './dailyRecord.service';
 import { MealService } from './meal.service';
+import * as bcrypt from 'bcrypt';
+import  nodemailer from 'nodemailer';
 
 
 export class UserService {
@@ -169,4 +171,98 @@ export class UserService {
         }
     }
     
+    async checkUserEmail(email: string): Promise<boolean> {
+        const userRepository = AppDataSource.getRepository(User2);
+
+        const user = await userRepository.findOneBy({ email });
+
+        return !!user;
+    }
+
+    async sendEmailConfirmation(uid: string, password: string): Promise<string> {
+        try {
+            const userRepository = AppDataSource.getRepository(User2);
+    
+            // Obtener el usuario por ID
+            const user = await userRepository.findOneBy({ uid });
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+    
+            // Genera un código de validación (puedes modificar la generación del código según lo necesites)
+            const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+            // Actualiza la contraseña del usuario
+            const passwordHash = await bcrypt.hash(password, 10);
+            await userRepository.update(uid, { passwordHash: passwordHash });
+
+            // Configura Nodemailer para enviar el correo
+            const transporter = nodemailer.createTransport({
+                host: "smtp.gmail.com",
+                port: 587,  // O usa el puerto 587 si estás usando STARTTLS
+                secure: false,  // true para 465, false para 587
+                auth: {
+                    user: 'admonfitness360@gmail.com',
+                    pass: 'nmsl tqan dugo jbmw', // Usa la contraseña de aplicación
+                },
+                tls: {
+                    rejectUnauthorized: false, // Desactiva la validación del certificado (no recomendado en producción)
+                }
+            });
+
+    
+            const mailOptions = {
+                from: 'admonfitness360@gmail.com',
+                to: user.email,
+                subject: 'Código de Validación',
+                html: `
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                        <h1 style="color: #4CAF50;">Código de Validación</h1>
+                        <p>Hola ${user.name},</p>
+                        <p>Este es tu código de validación:</p>
+                        <h2 style="color: #FF5722;">${generatedCode}</h2>
+                        <p>Por favor, usa este código para completar tu proceso de cambio de contraseña.</p>
+                        <p>Gracias,</p>
+                        <p>El equipo de Fitness360</p>
+                    </div>
+                `,
+            };
+
+    
+            // Envía el correo
+            await transporter.sendMail(mailOptions);
+    
+            return generatedCode;
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.log(error.message);
+                throw new Error(`Error al cambiar la contraseña del usuario: ${error.message}`);
+            } else {
+                throw new Error('Error desconocido al cambiar la contraseña del usuario');
+            }
+        }
+    }
+
+    async changePassword(uid: string, newPassword: string): Promise<void> {
+        try {
+            const userRepository = AppDataSource.getRepository(User2);
+
+            // Obtiene el usuario por ID
+            const user = await userRepository.findOneBy({ uid });
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            const newpasswordHash = await bcrypt.hash(newPassword, 10);
+            user.passwordHash = newpasswordHash;
+            
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.log(error)
+                throw new Error(`Error al cambiar la contraseña del usuario: ${error.message}`);
+            } else {
+                throw new Error('Error desconocido al cambiar la contraseña del usuario');
+            }
+        }
+    }   
 }

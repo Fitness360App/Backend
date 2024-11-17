@@ -20,4 +20,9 @@ router.get('/isAdmin/:uid', userController.isUserAdmin);
 
 router.delete('/deleteUser/:uid', userController.deleteUser);
 
+router.get('/checkUserEmail/:email', userController.checkUserEmail);
+
+router.put('/sendEmailConfirmation', userController.sendEmailConfirmation);
+
+router.put('/changePassword', userController.changePassword);
 export default router;
