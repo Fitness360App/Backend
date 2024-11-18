@@ -24,5 +24,7 @@ router.get('/checkUserEmail/:email', userController.checkUserEmail);
 
 router.put('/sendEmailConfirmation', userController.sendEmailConfirmation);
 
+router.get('/sendEmailConfirmationbyEmail/:email', userController.sendEmailConfirmationbyEmail);
+
 router.put('/changePassword', userController.changePassword);
 export default router;
