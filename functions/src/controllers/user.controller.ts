@@ -214,6 +214,27 @@ export class UserController {
         }
     };
 
+    sendEmailConfirmationbyEmail = async (req: any, res: any) => {
+        console.log('Request Body:', req.params);
+        const { email } = req.params;
+    
+        if (!email || typeof email !== 'string') {
+            return res.status(400).json({ message: 'El email es inválido o está vacío.' });
+        }
+    
+        try {
+            const { uid, validationCode } = await this.userService.sendEmailConfirmationByMail(email);
+           
+            return res.status(200).json({ uid, validationCode });
+        } catch (error) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Ocurrió un error desconocido.' });
+            }
+        }
+    };
+
     // Método para cambiar la contraseña del usuario
     changePassword = async (req: any, res: any) => {
         const { uid, password } = req.body; 
