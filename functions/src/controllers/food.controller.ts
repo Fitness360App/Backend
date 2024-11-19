@@ -62,7 +62,7 @@ export class FoodController {
 
     // Nuevo método para crear un alimento
     createFood = async (req: Request, res: Response) => {
-        const { barcode, name, brand, servingSize, nutrients } = req.body;
+        const { barcode, name, brand, servingSize, nutrients, imagePath } = req.body;
 
         // Validación de los campos requeridos
         if (!barcode || !name || !brand || !servingSize || !nutrients) {
@@ -93,7 +93,8 @@ export class FoodController {
                 proteins: parseFloat(nutrients.proteins),
                 fats: parseFloat(nutrients.fats),
                 kcals: parseFloat(nutrients.kcals)
-            }
+            },
+            imagePath
         };
 
         try {
@@ -116,6 +117,7 @@ export class FoodController {
         try {
             const foods = await this.foodService.getFeaturedFoods();
     
+            console.log('Featured foods:', foods);
             if (foods.length === 0) {
                 return res.status(404).json({ message: 'No featured foods available' });
             }

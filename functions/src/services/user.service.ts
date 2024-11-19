@@ -104,12 +104,6 @@ export class UserService {
     async modifyUserGoals(uid: string, updatedGoals: { carbs: number; proteins: number; fats: number; kcals: number }): Promise<void> {
         const userRepository = AppDataSource.getRepository(User2);
 
-        console.log(userRepository)
-        
-        console.log("==================================")
-
-        console.log("HOLA2")
-
 
         // Verifica si el usuario existe
         const user = await userRepository.findOneBy({ uid });
@@ -117,7 +111,6 @@ export class UserService {
             throw new UserNotFoundException('Usuario no encontrado');
         }
     
-        console.log("Esto es el updatedGoals:",updatedGoals)
         // Actualiza los macros
         await userRepository.update(uid, {
             carbs: updatedGoals.carbs,
@@ -225,15 +218,27 @@ export class UserService {
                 to: user.email,
                 subject: 'Código de Validación',
                 html: `
-                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                        <h1 style="color: #4CAF50;">Código de Validación</h1>
-                        <p>Hola ${user.name},</p>
-                        <p>Este es tu código de validación:</p>
-                        <h2 style="color: #FF5722;">${generatedCode}</h2>
-                        <p>Por favor, usa este código para completar tu proceso de cambio de contraseña.</p>
-                        <p>Gracias,</p>
-                        <p>El equipo de Fitness360</p>
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f0f4f8; padding: 20px; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+                        <div style="background-color: #005a9e; color: white; padding: 15px 20px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Fitness360</h1>
+                        </div>
+                        <div style="padding: 20px;">
+                            <p style="font-size: 16px; color: #333;">Hola <strong>${user.name}</strong>,</p>
+                            <p style="font-size: 16px; color: #333;">Recibimos una solicitud para restablecer tu contraseña. Usa el siguiente código para completar el proceso:</p>
+                            <div style="text-align: center; margin: 20px 0;">
+                                <span style="display: inline-block; font-size: 28px; color: #005a9e; font-weight: bold; padding: 10px 20px; border: 2px solid #005a9e; border-radius: 5px; background-color: #f0f4f8;">
+                                    ${generatedCode}
+                                </span>
+                            </div>
+                            <p style="font-size: 16px; color: #333;">Si no solicitaste este cambio, puedes ignorar este mensaje. Tu contraseña seguirá segura.</p>
+                            <p style="margin-top: 30px; font-size: 14px; color: #666;">Gracias por usar Fitness360. Estamos aquí para ayudarte a alcanzar tus metas.</p>
+                        </div>
+                        <div style="background-color: #005a9e; padding: 15px 20px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; color: white; font-size: 12px;">
+                            &copy; ${new Date().getFullYear()} Fitness360. Todos los derechos reservados.
+                        </div>
                     </div>
+                </div>
                 `,
             };
 
@@ -287,15 +292,27 @@ export class UserService {
                 to: user.email,
                 subject: 'Código de Validación',
                 html: `
-                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                        <h1 style="color: #4CAF50;">Código de Validación</h1>
-                        <p>Hola ${user.name},</p>
-                        <p>Este es tu código de validación:</p>
-                        <h2 style="color: #FF5722;">${generatedCode}</h2>
-                        <p>Por favor, usa este código para completar tu proceso de cambio de contraseña.</p>
-                        <p>Gracias,</p>
-                        <p>El equipo de Fitness360</p>
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f0f4f8; padding: 20px; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+                        <div style="background-color: #005a9e; color: white; padding: 15px 20px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Fitness360</h1>
+                        </div>
+                        <div style="padding: 20px;">
+                            <p style="font-size: 16px; color: #333;">Hola <strong>${user.name}</strong>,</p>
+                            <p style="font-size: 16px; color: #333;">Recibimos una solicitud para restablecer tu contraseña. Usa el siguiente código para completar el proceso:</p>
+                            <div style="text-align: center; margin: 20px 0;">
+                                <span style="display: inline-block; font-size: 28px; color: #005a9e; font-weight: bold; padding: 10px 20px; border: 2px solid #005a9e; border-radius: 5px; background-color: #f0f4f8;">
+                                    ${generatedCode}
+                                </span>
+                            </div>
+                            <p style="font-size: 16px; color: #333;">Si no solicitaste este cambio, puedes ignorar este mensaje. Tu contraseña seguirá segura.</p>
+                            <p style="margin-top: 30px; font-size: 14px; color: #666;">Gracias por usar Fitness360. Estamos aquí para ayudarte a alcanzar tus metas.</p>
+                        </div>
+                        <div style="background-color: #005a9e; padding: 15px 20px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; color: white; font-size: 12px;">
+                            &copy; ${new Date().getFullYear()} Fitness360. Todos los derechos reservados.
+                        </div>
                     </div>
+                </div>
                 `,
             };
 
@@ -303,7 +320,6 @@ export class UserService {
             // Envía el correo
             await transporter.sendMail(mailOptions);
     
-            console.log("uid:",user.uid, "validationCode:",generatedCode)
             return { uid: user.uid, validationCode: generatedCode };
         } catch (error: unknown) {
             if (error instanceof Error) {

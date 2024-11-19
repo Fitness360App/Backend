@@ -30,7 +30,8 @@ export class FoodService {
                     proteins: food.proteins,
                     fats: food.fats,
                     kcals: food.kcals,
-                }
+                },
+                imagePath: food.imagePath,
             };
         } catch (error) {
             throw new FoodServiceException('Error al buscar el alimento por código de barras');
@@ -66,7 +67,8 @@ export class FoodService {
                     proteins: food.proteins,
                     fats: food.fats,
                     kcals: food.kcals,
-                }
+                },
+                imagePath: food.imagePath,
             }));
         } catch (error) {
             throw new FoodServiceException('Error al buscar el alimento por nombre');
@@ -77,7 +79,6 @@ export class FoodService {
 
     async createFood(food: Food): Promise<void> {
         try {
-            console.log(food);
     
             // Obtén el repositorio de Food
             const foodRepository = AppDataSource.getRepository(Food2);
@@ -89,7 +90,6 @@ export class FoodService {
                 throw new FoodServiceException('El alimento ya existe con ese código de barras');
             }
     
-            console.log("Entro");
     
             // Crear un nuevo objeto de alimento con el nombre en minúsculas para búsquedas insensibles a mayúsculas
             const foodWithLowercaseName = foodRepository.create({
@@ -99,6 +99,7 @@ export class FoodService {
                 proteins: food.nutrients.proteins,
                 fats: food.nutrients.fats,
                 kcals: food.nutrients.kcals,
+                imagePath: food.imagePath,
             });
     
             // Guardar el alimento en la base de datos
@@ -129,6 +130,7 @@ export class FoodService {
                     fats: food.fats,
                     kcals: food.kcals,
                 },
+                imagePath: food.imagePath,
             }));
         } catch (error) {
             throw new FoodServiceException('Error al obtener alimentos destacados');
