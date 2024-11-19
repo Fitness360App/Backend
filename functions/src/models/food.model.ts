@@ -9,4 +9,5 @@ export interface Food {
         fats: number;       // Grasas (en gramos)
         kcals: number;      // Calorías (en kcal)
     };
+    imagePath?: string; // Nueva propiedad opcional
 }

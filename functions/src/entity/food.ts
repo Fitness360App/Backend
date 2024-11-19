@@ -31,4 +31,7 @@ export class Food2 {
 
     @OneToMany(() => MealFood, mealFood => mealFood.food)
     mealFoods!: MealFood[]; // Relación con MealFood
+
+    @Column({ nullable: true }) // Permite valores nulos inicialmente
+    imagePath?: string;
 }

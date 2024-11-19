@@ -47,6 +47,7 @@ export class DailyRecordService {
     } | null> {
         const formattedDate = date; // Usa la fecha tal cual o formatea si es necesario
     
+        console.log("formattedDate", formattedDate);
         // Obtén el repositorio de DailyRecord
         const dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
     
@@ -202,7 +203,7 @@ export class DailyRecordService {
     }
 
 
-    async updateProcess(uid: string): Promise<void> {
+    async updateProcess(uid: string, date: string): Promise<void> {
         // Inicializar variables para los nutrientes
         let totalKcals = 0;
         let totalCarbs = 0;
@@ -212,6 +213,8 @@ export class DailyRecordService {
         // Definir los tipos de comidas que vamos a procesar
         const mealTypes = ['breakfast', 'lunch', 'snack', 'dinner'] as const;
     
+
+        console.log("mealTypes", mealTypes);
         // Repositorios necesarios
         const mealRepository = AppDataSource.getRepository(Meal2);
         const mealFoodRepository = AppDataSource.getRepository(MealFood);
@@ -260,7 +263,10 @@ export class DailyRecordService {
         }
     
         // Actualizar el registro diario con los nutrientes calculados
-        const dailyRecord = await this.dailyRecordRepository.findOne({ where: { uid } });
+
+        const dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
+        const dailyRecord = await dailyRecordRepository.findOneBy({ uid, date });
+
     
         if (!dailyRecord) {
             throw new Error(`No se encontró el registro diario para el usuario ${uid}`);

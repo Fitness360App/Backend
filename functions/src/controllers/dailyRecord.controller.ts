@@ -192,14 +192,16 @@ export class DailyRecordController {
 
 
     updateNutrients = async (req: any, res: any) => {
-        const { uid } = req.params;
+        const { uid, date } = req.params;
 
         if (!uid) {
             return res.status(400).json({ message: 'UID del usuario es requerido' });
         }
 
+        const formattedDate = convertToDatabaseDate(date);
+
         try {
-            await this.dailyRecordService.updateProcess(uid);
+            await this.dailyRecordService.updateProcess(uid, formattedDate);
             return res.status(200).json({ message: 'Progreso actualizado correctamente' });
         } catch (error) {
             return res.status(500).json({ message: error instanceof Error ? error.message : 'Error desconocido ocurrió' });
