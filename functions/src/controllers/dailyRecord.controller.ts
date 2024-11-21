@@ -208,4 +208,52 @@ export class DailyRecordController {
         }
     };
     
+
+
+    // Método para obtener el historial de dailyRecords
+    getHistory = async (req: any, res: any) => {
+        const { uid, year, month } = req.params;
+        
+        if (!uid) {
+            return res.status(400).json({ message: 'UID del usuario es requerido' });
+        }
+
+        if (!year && !month) {
+            return res.status(400).json({ message: 'Se requiere al menos un año o un mes' });
+        }
+
+        try {
+            // Llama al servicio para obtener el historial
+            const history = await this.dailyRecordService.getHistory(uid, year, month);
+            return res.status(200).json(history);
+        } catch (error) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Error desconocido al obtener el historial' });
+            }
+        }
+    };
+
+
+    getBestSteps = async (req: any, res: any) => {
+        const { date } = req.params;
+    
+        if (!date) {
+            return res.status(400).json({ message: 'La fecha es requerida en formato YYYY-MM-DD' });
+        }
+    
+        try {
+            // Llama al servicio para obtener los tres registros con más pasos
+            const bestSteps = await this.dailyRecordService.getBestSteps(date);
+            return res.status(200).json(bestSteps);
+        } catch (error) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            } else {
+                return res.status(500).json({ message: 'Error desconocido al obtener los registros con más pasos' });
+            }
+        }
+    };
+    
 }
