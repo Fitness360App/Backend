@@ -24,4 +24,10 @@ router.put('/updateBurnedKcalsFromSteps', dailyRecordController.updateBurnedKcal
 
 router.post('/updateNutrients/:uid/:date', dailyRecordController.updateNutrients)
 
+
+router.get('/history/:uid/:year?/:month?', dailyRecordController.getHistory);
+
+router.get('/bestSteps/:date', dailyRecordController.getBestSteps);
+
+
 export default router;

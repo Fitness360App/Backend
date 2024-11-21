@@ -313,4 +313,66 @@ export class DailyRecordService {
         }
     }
 
+
+
+    //Historial de registros diarios
+    async getHistory(uid: string, year?: string, month?: string): Promise<DailyRecord2[]> {
+        const dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
+    
+        // Construir la consulta de acuerdo con los parámetros
+        const query = dailyRecordRepository.createQueryBuilder('dailyRecord')
+            .where('dailyRecord.uid = :uid', { uid });
+    
+        if (year) {
+            query.andWhere('YEAR(dailyRecord.date) = :year', { year });
+        }
+    
+        if (month) {
+            query.andWhere('MONTH(dailyRecord.date) = :month', { month });
+        }
+    
+        try {
+            // Ejecutar la consulta y retornar los registros
+            const records = await query.getMany();
+            return records;
+        } catch (error) {
+            throw new DailyRecordException(`Error al obtener el historial: ${(error as Error).message}`);
+        }
+    }
+
+
+    //Obtener los tres registros con más pasos en una fecha
+    async getBestSteps(date: string): Promise<{ name: string; steps: number }[]> {
+        const dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
+        const userRepository = AppDataSource.getRepository(User2);
+    
+        try {
+            // Consulta los tres registros con más pasos en la fecha especificada
+            const bestSteps = await dailyRecordRepository
+                .createQueryBuilder('dailyRecord')
+                .where('dailyRecord.date = :date', { date })
+                .orderBy('dailyRecord.steps', 'DESC') // Ordenar por pasos en orden descendente
+                .limit(3) // Limitar a los tres primeros
+                .getMany();
+    
+            // Mapear los registros para incluir el nombre del usuario
+            const result = await Promise.all(
+                bestSteps.map(async (record) => {
+                    const user = await userRepository.findOneBy({ uid: record.uid });
+                    return {
+                        name: user?.name || 'Usuario desconocido', // Suponiendo que el modelo de usuario tiene un campo `name`
+                        steps: record.steps,
+                    };
+                })
+            );
+    
+            return result;
+        } catch (error) {
+            throw new DailyRecordException(`Error al obtener los registros con más pasos: ${(error as Error).message}`);
+        }
+    }
+    
+    
+    
+
 }
