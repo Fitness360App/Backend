@@ -213,6 +213,10 @@ export class DailyRecordController {
     // Método para obtener el historial de dailyRecords
     getHistory = async (req: any, res: any) => {
         const { uid, year, month } = req.params;
+
+        console.log(uid)
+        console.log(year)
+        console.log(month)
         
         if (!uid) {
             return res.status(400).json({ message: 'UID del usuario es requerido' });
@@ -243,9 +247,11 @@ export class DailyRecordController {
             return res.status(400).json({ message: 'La fecha es requerida en formato YYYY-MM-DD' });
         }
     
+        const formattedDate = convertToDatabaseDate(date);
+
         try {
             // Llama al servicio para obtener los tres registros con más pasos
-            const bestSteps = await this.dailyRecordService.getBestSteps(date);
+            const bestSteps = await this.dailyRecordService.getBestSteps(formattedDate);
             return res.status(200).json(bestSteps);
         } catch (error) {
             if (error instanceof Error) {

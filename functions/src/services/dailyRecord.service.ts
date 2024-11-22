@@ -44,18 +44,29 @@ export class DailyRecordService {
         };
         steps: number;
         burnedKcals: number;
+        date: string;
     } | null> {
         const formattedDate = date; // Usa la fecha tal cual o formatea si es necesario
     
-        console.log("formattedDate", formattedDate);
         // Obtén el repositorio de DailyRecord
         const dailyRecordRepository = AppDataSource.getRepository(DailyRecord2);
     
         // Consulta para obtener el registro del usuario por uid y fecha
-        const record = await dailyRecordRepository.findOneBy({ uid, date: formattedDate });
+        let record = await dailyRecordRepository.findOneBy({ uid, date: formattedDate });
+
     
+        // Si no se encuentra un registro, crea uno vacío
         if (!record) {
-            throw new DailyRecordException(`No se encontró un registro diario para la fecha ${formattedDate}`);
+            console.log(`Registro diario no encontrado para ${formattedDate}. Creando uno nuevo...`);
+            await this.createEmptyDailyRecord(uid, formattedDate);
+
+            // Intenta obtener el registro recién creado
+            record = await dailyRecordRepository.findOneBy({ uid, date: formattedDate });
+
+            // Si por alguna razón no se crea el registro, lanza una excepción
+            if (!record) {
+                throw new DailyRecordException(`Error al crear un registro diario para la fecha ${formattedDate}`);
+            }
         }
     
         // Retornar el registro con los campos necesarios
@@ -69,11 +80,10 @@ export class DailyRecordService {
             },
             steps: record.steps,
             burnedKcals: record.burnedKcals,
+            date: record.date,
         };
     }
     
-
-
 
     async createEmptyDailyRecord(uid: string, date: string): Promise<void> {
         // Usa la fecha recibida directamente o formatea la fecha actual
