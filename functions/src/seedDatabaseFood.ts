@@ -22,7 +22,7 @@ async function seedDatabaseFood() {
                 fats: 25,
                 kcals: 510,
                 mealFoods: [],
-                imagePath: "anacardos.jpg",
+                imagePath: "principe.jpg",
             },
             {
                 barcode: "8436030521628",
@@ -34,7 +34,7 @@ async function seedDatabaseFood() {
                 fats: 48,
                 kcals: 61,
                 mealFoods: [],
-                imagePath: "principe.jpg",
+                imagePath: "anacardos.jpg",
             },
             // Agrega aquí los otros 8 productos
             {
@@ -87,7 +87,7 @@ async function seedDatabaseFood() {
             },
             {
                 barcode: "0723120863033",
-                name: " Mermelada de Tuno Verde",
+                name: "Mermelada de Tuno Verde",
                 brand: "Cactus Jam",
                 servingSize: 100,
                 carbs: 60,
